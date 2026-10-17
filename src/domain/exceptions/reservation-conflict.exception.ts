@@ -1,7 +1,7 @@
-class ReservationConflictException extends Error {
+export class ReservationConflictException extends Error {
     public constructor(
-        public readonly code: string = 'RESERVATION_CONFLICT',
-        message: string
+        message: string,
+        public readonly code: string = 'RESERVATION_CONFLICT'
     ) {
         super(message);
         this.name = 'ReservationConflictException';

@@ -1,3 +1,5 @@
+﻿import { randomUUID } from "node:crypto";
+
 import { Cost } from "../value-objects/cost.vo";
 import { SpaceId } from "../value-objects/space-id.vo";
 import { TimeSlot } from "../value-objects/time-slot.vo";
@@ -12,8 +14,12 @@ export class Space {
         public readonly capacity: number,
         public readonly basePrice: Cost,
         public readonly availabilityWindows: TimeSlot[],
-        private isActive: boolean = true
+        private _isActive: boolean = true
     ) {}
+
+    get isActive(): boolean {
+        return this._isActive;
+    }
 
     static create(params: {
         name: string;
@@ -33,7 +39,7 @@ export class Space {
             throw new Error('The availability windows must be greater');
         }
 
-        const id: SpaceId = SpaceId.create(crypto.randomUUID());
+        const id: SpaceId = SpaceId.create(randomUUID());
 
         return new Space(id,
             params.name,
@@ -50,7 +56,7 @@ export class Space {
     }
 
     deactivate(): void {
-        if (!this.isActive) throw new Error('space already deactivate');
-        this.isActive = false;
+        if (!this._isActive) throw new Error('space already deactivate');
+        this._isActive = false;
     }
 }
