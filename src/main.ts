@@ -10,7 +10,8 @@ const PORT: number = 3000;
 
 // §11 middleware order (Decorator pattern):
 // helmet → cors → express.json → requestLogger → rateLimiter → routes → errorHandler LAST.
-const createApp = (container: Container): Express => {
+// Exported so supertest e2e tests (T21) can build the app without listening.
+export const createApp = (container: Container): Express => {
     const app: Express = express();
 
     app.use(helmet());
@@ -33,4 +34,9 @@ const bootstrap = (): void => {
     });
 };
 
-bootstrap();
+// §11 bootstrap runs ONLY when this module is the process entry point
+// (node dist/main.js); imported by tests, the Express app builds without an
+// open port.
+if (require.main === module) {
+    bootstrap();
+}
