@@ -2,14 +2,13 @@
   "name": "comuna-sport-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "ts-node src/main.ts",
-    "test": "jest"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.13"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -17,18 +16,30 @@
       "onFail": "download"
     }
   },
-  "type": "module",
+  "scripts": {
+    "dev": "ts-node src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "cors": "^2.8.6",
+    "express-rate-limit": "^8.2.1",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.13.0",
     "@types/supertest": "^7.2.1",
     "jest": "^30.4.2",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3"
   }
 }

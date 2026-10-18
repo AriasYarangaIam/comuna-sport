@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 import { Cost } from "../value-objects/cost.vo";
 import { ReservationId } from "../value-objects/reservation-id.vo";
 import { SpaceId } from "../value-objects/space-id.vo";
@@ -13,8 +15,12 @@ export class Reservation {
         public readonly cost: Cost,
         public readonly role: UserRole,
         public readonly createdAt: Date,
-        private isActive: boolean = true
+        private _isActive: boolean = true
     ) {}
+
+    get isActive(): boolean {
+        return this._isActive;
+    }
 
     static create(params: {
         spaceId: SpaceId,
@@ -26,7 +32,7 @@ export class Reservation {
 
         if(params.userId.length < 1) throw new Error('The user id does not accept empty value');
 
-        const id: ReservationId = ReservationId.create(crypto.randomUUID());
+        const id: ReservationId = ReservationId.create(randomUUID());
         const date: Date = new Date();
 
         return new Reservation(id,
@@ -40,7 +46,7 @@ export class Reservation {
     }
 
     cancel(): void {
-        if (!this.isActive) throw new Error('reservation already cancelled');
-        this.isActive = false;
+        if (!this._isActive) throw new Error('reservation already cancelled');
+        this._isActive = false;
     }
 }
