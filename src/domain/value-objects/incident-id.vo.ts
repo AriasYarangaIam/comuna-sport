@@ -1,4 +1,12 @@
 export class IncidentId {
+    // Phantom brand (DEVELOPMENT.md principle #6, `string & { readonly
+    // __brand: 'IncidentId' }` form): a declared-only field typed with THIS
+    // id's literal makes IncidentId NOT assignable to any other ID VO.
+    // Emits no runtime code — zero behavior change. Public (not private)
+    // because Object.freeze's Readonly<T> mapped type strips private members
+    // and would break the create() return type.
+    public declare readonly __brand: 'IncidentId';
+
     private constructor(public readonly value: string) {}
 
     static create(value: string): IncidentId {

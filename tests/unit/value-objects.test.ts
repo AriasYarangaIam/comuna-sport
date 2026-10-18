@@ -81,12 +81,13 @@ describe('UUID v4 branded ID value objects', (): void => {
         // static factories — the constructors are private.
         // @ts-expect-error - SpaceId's constructor is private; only SpaceId.create may build one
         void new SpaceId(spaceId.value);
-        // Compile-level gate #2 (exact type-shaped assertion): the two branded
-        // classes are separate DECLARATIONS. NOTE: as implemented (`private
-        // constructor` + public `value: string`), TypeScript still treats them
-        // as structurally compatible, so a SpaceId assigned to a
-        // ReservationId slot is NOT a compile error; runtime type identity
-        // remains disjoint and is asserted here.
+        // Compile-level gate #2 (EXACT brand assertion): the phantom private
+        // brand field makes the two ID classes nominally incompatible, so a
+        // SpaceId holding a ReservationId slot is a REAL compile error.
+        // @ts-expect-error - SpaceId is not assignable to ReservationId (compile-time brand gate)
+        const wrongSlot: ReservationId = spaceId;
+        void wrongSlot;
+        // Runtime identity remains disjoint (each VO is its own class).
         expect(spaceId.constructor === reservationId.constructor).toBe(false);
         expect(spaceId).not.toBe(reservationId);
     });
