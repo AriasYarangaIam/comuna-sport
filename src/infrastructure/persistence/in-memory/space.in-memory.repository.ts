@@ -58,7 +58,8 @@ export class InMemorySpaceRepository implements SpaceReader, SpaceWriter {
     }
 
     public async findAll(): Promise<Space[]> {
-        return [...this.storage.values()];
+        // DATABASE.md §7: SpaceReader.findAll → WHERE is_active.
+        return [...this.storage.values()].filter((space: Space): boolean => space.isActive);
     }
 
     public async findByAvailability(timeSlot: TimeSlot): Promise<Space[]> {

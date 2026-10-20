@@ -1,3 +1,13 @@
+export const BUSINESS_TIME_ZONE = 'America/Lima';
+
+const toBusinessDateKey = (date: Date): string =>
+    new Intl.DateTimeFormat('en-CA', {
+        timeZone: BUSINESS_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).format(date);
+
 export class TimeSlot {
     private constructor(
         public readonly start: Date,
@@ -7,7 +17,7 @@ export class TimeSlot {
 
     static create(start: Date, end: Date): TimeSlot {
         if (end <= start) throw new Error('slot end must be after start');
-        if (start.toDateString() !== end.toDateString()) throw new Error('slot must be within the same calendar');
+        if (toBusinessDateKey(start) !== toBusinessDateKey(end)) throw new Error('slot must be within the same calendar');
         
         return Object.freeze(new TimeSlot(start, end));
     }
