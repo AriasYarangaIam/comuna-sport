@@ -7,3 +7,4 @@ dist/
 .codegraph/
 DEVELOPMENT.md
 DATABASE.md
+.env
