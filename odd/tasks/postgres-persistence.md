@@ -60,39 +60,42 @@ above 400 authored lines, so the work is split into five reviewable slices.
 
 ## Tasks
 
-- [ ] **T1 — DB scaffolding**: `docker-compose.yml`, `.env.example`, `.env`, `.gitignore`,
-  `db/migrations/001_schema.sql`, `db/migrations/002_seed_spaces.sql`, `db/migrate.ts`,
-  `db/sweep-idempotency.ts`, `package.json` (`pg`, `@types/pg`, `db:*` scripts).
-- [ ] **T2 — Bring the instance up** on 5433, apply migrations, verify tables and seed rows.
-- [ ] **T3 — Domain readiness**: `fromPersistence` on `Space`/`Reservation`/`Incident`,
-  incident state-behavior factory, `TimeSlot` Lima-day validation, `findAll` active-only.
-- [ ] **T4 — Persistence adapters**: `pg` pool, row mappers, three repositories,
-  DB idempotency store, `createIdempotencyGuard(store)`, env-driven container.
-- [ ] **T5 — Read surface**: `GET /spaces`, `GET /spaces/:id`, `GET /spaces/availability`,
-  `GET /reservations/:id`, `GET /users/:userId/reservations`, `GET /incidents/:id`,
-  `GET /spaces/:id/incidents` + DTOs + controllers + routes.
-- [ ] **T6 — Tests**: mapper/adapter integration tests gated on `DATABASE_URL`, read-route
-  e2e tests on the in-memory container.
-- [ ] **T7 — Verification**: `pnpm build` clean, `pnpm test` green, live smoke against the
-  Docker database (create → restart → read, 409 overlap, idempotent replay).
-
-## Acceptance criteria
-
-1. `docker compose up -d` + `pnpm db:migrate` produce the 5 tables and 4 seeded spaces.
-2. With `DATABASE_URL` set, `POST /spaces/:id/reservations` returns 201 and the row survives
-   a process restart.
-3. A second overlapping reservation returns 409 (DB `EXCLUDE`, not app-level check).
-4. Replaying the same `Idempotency-Key` returns the stored 201; a different payload returns 422.
-5. `GET` endpoints return the seeded spaces and the created rows.
-6. `pnpm test` passes with the baseline suite intact; `pnpm build` emits no errors.
-
-## Checks
-
-- `pnpm test`
-- `pnpm build`
-- `docker compose up -d && pnpm db:migrate`
-- live smoke against `http://localhost:3000`
+- [x] **T1 — DB scaffolding** — `docker-compose.yml` (postgres:16-alpine, host 5434), `.env`/`.env.example`,
+  `.gitignore`, `db/migrations/001_schema.sql` (5 tables + 4 indexes), `db/migrations/002_seed_spaces.sql`,
+  `db/migrate.js`, `db/sweep-idempotency.js`, `db/seed.js`, `pg` + `@types/pg`, `db:*` scripts.
+  Commit `2c9762d`.
+- [x] **T2 — Instance up** — container healthy on 5434, 2 migrations applied, 4 spaces + 120 windows
+  (30 Lima days each). 9 constraint cases verified in SQL: overlap → 23P01, touching slot → OK,
+  cross-day → same-day CHECK, USD → currency CHECK, bad role → role CHECK, cancelled row → no block,
+  overlapping windows → 23P01, duplicate idempotency key → 23505. Commit `2c9762d`.
+- [x] **T3 — Domain readiness** — `fromPersistence` on `Space`/`Reservation`/`Incident`,
+  `createIncidentStateBehavior`, `TimeSlot` on `BUSINESS_TIME_ZONE` (`America/Lima`),
+  `findAll` active-only. Commit `bab922f`.
+- [x] **T4 — Persistence adapters** — `pg` pool, row mappers, 3 repositories, `IdempotencyStore` port +
+  PostgreSQL and in-memory adapters, `createIdempotencyGuard(store)`, env-driven container.
+  Commit `2112ede`.
+- [x] **T5 — Read surface** — query bus + 7 query handlers, 3 DTO mappers, 7 GET endpoints.
+  Commit `a010000`.
+- [x] **T6 — Tests** — `tests/e2e/read-api.test.ts` (11, always) and
+  `tests/integration/postgres.adapters.test.ts` (11, only with `DATABASE_URL`).
+  Commit `b66008b`.
+- [x] **T7 — Verification** — `pnpm build` clean; `pnpm test` 152 passed + 11 skipped (hermetic) and
+  163 passed with the database; live server smoke on port 3000 against the Docker DB: 20/20 checks,
+  a reservation survived a process restart, and the idempotent replay returned the same id
+  after the restart. `DATABASE.md` §8/§10 updated with the real seed and the new drift rows.
 
 ## Progress
 
 _(updated per task)_
+
+## Notes / decisions taken
+
+- Host port is **5434**: 5432 is the local PostgreSQL service and 5433 was already published by
+  another project's container (`pos-system-saas-postgres`).
+- The in-memory adapters stay the default when `DATABASE_URL` is absent; `buildContainer({ databaseUrl: '' })`
+  pins them explicitly so the Jest suites stay hermetic even with the variable exported.
+- The seed owns the reference catalog: it replaces the availability windows of the four reference
+  spaces, because `SpaceWriter.save()` rewrites them with fresh surrogate ids and an id-based
+  upsert would then violate `windows_no_overlap`. `pnpm db:seed` restores the catalog after drift.
+- `DATABASE.md` drift ledger now records the four deltas this implementation exposed
+  (window replacement, nullable incident columns, seed example, idempotency port).
