@@ -27,6 +27,13 @@ export const createApp = (container: Container): Express => {
 };
 
 const bootstrap = (): void => {
+    // Loaded here (never at module top level) so importing `createApp` from
+    // tests never touches the filesystem or the process environment.
+    try {
+        process.loadEnvFile();
+    } catch {
+        // no .env file — configuration comes from the environment
+    }
     const container: Container = buildContainer();
     const app: Express = createApp(container);
     app.listen(PORT, (): void => {
