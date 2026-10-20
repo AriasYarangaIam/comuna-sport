@@ -37,8 +37,10 @@ interface Fixture {
 // Wires the REAL in-memory repos + registry factory + LocalEventBus exactly
 // like the composition root: every buildContainer() call is a fresh
 // composition — new maps, re-seeded spaces, new event bus.
+// The empty databaseUrl pins the in-memory adapter: this suite stays hermetic
+// even when DATABASE_URL is exported in the environment.
 const buildFixture = async (): Promise<Fixture> => {
-    const container = buildContainer();
+    const container = buildContainer({ databaseUrl: '' });
     const spaces = container.resolve<InMemorySpaceRepository>('spaceRepository');
     const seededSpaces: readonly Space[] = await spaces.findAll();
     if (seededSpaces.length === 0 || seededSpaces[0] === undefined) {

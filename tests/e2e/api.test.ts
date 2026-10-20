@@ -59,7 +59,9 @@ const assertAPIErrorShape = (res: SuperTestResponse): void => {
 // One app + one container for the whole suite (seeded ids stay stable, the
 // inactive-space mutation applies to THIS app). Total request volume (~17)
 // stays under the 100/15min rate limit for one IP.
-const container = buildContainer();
+// The empty databaseUrl pins the in-memory adapter: this suite stays hermetic
+// even when DATABASE_URL is exported in the environment.
+const container = buildContainer({ databaseUrl: '' });
 const app = createApp(container);
 
 const seedSpace = async (name: string): Promise<Space> => {

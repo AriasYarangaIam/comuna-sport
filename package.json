@@ -26,6 +26,7 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:migrate": "node db/migrate.js",
+    "db:seed": "node db/seed.js",
     "db:sweep": "node db/sweep-idempotency.js"
   },
   "dependencies": {

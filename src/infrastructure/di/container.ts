@@ -96,6 +96,8 @@ export type ContainerTokens =
 // in-memory adapter (auto-seeded) keeps the app usable and makes Jest hermetic.
 export const buildContainer = (options: { readonly databaseUrl?: string } = {}): Container => {
     const container: Container = new Container();
+    // An empty string means "no database": it pins the in-memory adapter even
+    // when DATABASE_URL is exported, which is how the test suites stay hermetic.
     const databaseUrl: string | undefined = options.databaseUrl ?? process.env['DATABASE_URL'];
 
     if (databaseUrl !== undefined && databaseUrl !== '') {
