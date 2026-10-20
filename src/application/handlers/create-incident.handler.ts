@@ -4,7 +4,7 @@ import { IncidentWriter } from "../../domain/repositories/incident.repository";
 import { SpaceReader } from "../../domain/repositories/space.repository";
 import { SpaceId } from "../../domain/value-objects/space-id.vo";
 import { CreateIncidentCommand } from "../commands/create-incident.command";
-import { IncidentResponseDto } from "../dtos/incident-response.dto";
+import { IncidentResponseDto, toIncidentResponseDto } from "../dtos/incident-response.dto";
 import { CommandHandler } from "../ports/command-bus.interface";
 
 export class CreateIncidentHandler implements CommandHandler<CreateIncidentCommand, IncidentResponseDto> {
@@ -36,16 +36,4 @@ export class CreateIncidentHandler implements CommandHandler<CreateIncidentComma
 
         return toIncidentResponseDto(incident);
     }
-}
-
-function toIncidentResponseDto(incident: Incident): IncidentResponseDto {
-    return {
-        id: incident.id.value,
-        spaceId: incident.spaceId.value,
-        reporterId: incident.reporterId,
-        description: incident.description,
-        state: incident.getState(),
-        createdAt: incident.createdAt.toISOString(),
-        resolvedAt: incident.resolvedAt === null ? null : incident.resolvedAt.toISOString()
-    };
 }

@@ -3,9 +3,18 @@ import type { Pool } from "pg";
 
 import { CreateIncidentHandler } from "../../application/handlers/create-incident.handler";
 import { CreateReservationHandler } from "../../application/handlers/create-reservation.handler";
+import { FindAvailableSpacesHandler } from "../../application/handlers/find-available-spaces.handler";
+import { GetIncidentHandler } from "../../application/handlers/get-incident.handler";
+import { GetReservationHandler } from "../../application/handlers/get-reservation.handler";
+import { GetSpaceHandler } from "../../application/handlers/get-space.handler";
+import { ListSpaceIncidentsHandler } from "../../application/handlers/list-space-incidents.handler";
+import { ListSpacesHandler } from "../../application/handlers/list-spaces.handler";
+import { ListUserReservationsHandler } from "../../application/handlers/list-user-reservations.handler";
 import type { CommandBus } from "../../application/ports/command-bus.interface";
 import type { IdempotencyStore } from "../../application/ports/idempotency-store.interface";
+import type { QueryBus } from "../../application/ports/query-bus.interface";
 import { CommandBusService } from "../../application/services/command-bus.service";
+import { QueryBusService } from "../../application/services/query-bus.service";
 import type { IncidentReader, IncidentWriter } from "../../domain/repositories/incident.repository";
 import type { ReservationReader, ReservationWriter } from "../../domain/repositories/reservation.repository";
 import type { SpaceReader, SpaceWriter } from "../../domain/repositories/space.repository";
@@ -16,9 +25,11 @@ import { PrivateClubStrategy } from "../../domain/services/cost-calculation/priv
 import { SeniorDiscountStrategy } from "../../domain/services/cost-calculation/senior-discount.strategy";
 import { IncidentController } from "../http/controllers/incident.controller";
 import { ReservationController } from "../http/controllers/reservation.controller";
+import { SpaceController } from "../http/controllers/space.controller";
 import { createIdempotencyGuard } from "../http/middleware/idempotency.middleware";
 import { createIncidentRoutes } from "../http/routes/incident.routes";
 import { createReservationRoutes } from "../http/routes/reservation.routes";
+import { createSpaceRoutes } from "../http/routes/space.routes";
 import { NotificationListener } from "../event-bus/listeners/notification.listener";
 import { LocalEventBus } from "../event-bus/local-event-bus.service";
 import { inMemoryIdempotencyStore } from "../persistence/in-memory/idempotency.in-memory.store";
@@ -65,10 +76,20 @@ export type ContainerTokens =
     | 'createReservationHandler'
     | 'createIncidentHandler'
     | 'commandBus'
+    | 'listSpacesHandler'
+    | 'getSpaceHandler'
+    | 'findAvailableSpacesHandler'
+    | 'getReservationHandler'
+    | 'listUserReservationsHandler'
+    | 'getIncidentHandler'
+    | 'listSpaceIncidentsHandler'
+    | 'queryBus'
     | 'reservationController'
     | 'incidentController'
+    | 'spaceController'
     | 'reservationRoutes'
-    | 'incidentRoutes';
+    | 'incidentRoutes'
+    | 'spaceRoutes';
 
 // Composition root — the ONLY place concretes appear (Singleton row, D2/D3 wiring).
 // With a database URL the D3 ports bind to the PostgreSQL adapter; otherwise the
@@ -132,11 +153,49 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
         return bus;
     });
 
+    container.register('spaceController', (): SpaceController =>
+        new SpaceController(container.resolve<QueryBus>('queryBus')));
+
     container.register('reservationController', (): ReservationController =>
-        new ReservationController(container.resolve<CommandBus>('commandBus')));
+        new ReservationController(container.resolve<CommandBus>('commandBus'), container.resolve<QueryBus>('queryBus')));
 
     container.register('incidentController', (): IncidentController =>
-        new IncidentController(container.resolve<CommandBus>('commandBus')));
+        new IncidentController(container.resolve<CommandBus>('commandBus'), container.resolve<QueryBus>('queryBus')));
+
+    // Read side mirrors the write side: one handler per query, each bound to the
+    // Reader PORTS, registered by query type into the bus.
+    container.register('listSpacesHandler', (): ListSpacesHandler =>
+        new ListSpacesHandler(container.resolve<SpaceReader>('spaceRepository')));
+
+    container.register('getSpaceHandler', (): GetSpaceHandler =>
+        new GetSpaceHandler(container.resolve<SpaceReader>('spaceRepository')));
+
+    container.register('findAvailableSpacesHandler', (): FindAvailableSpacesHandler =>
+        new FindAvailableSpacesHandler(container.resolve<SpaceReader>('spaceRepository')));
+
+    container.register('getReservationHandler', (): GetReservationHandler =>
+        new GetReservationHandler(container.resolve<ReservationReader>('reservationRepository')));
+
+    container.register('listUserReservationsHandler', (): ListUserReservationsHandler =>
+        new ListUserReservationsHandler(container.resolve<ReservationReader>('reservationRepository')));
+
+    container.register('getIncidentHandler', (): GetIncidentHandler =>
+        new GetIncidentHandler(container.resolve<IncidentReader>('incidentRepository')));
+
+    container.register('listSpaceIncidentsHandler', (): ListSpaceIncidentsHandler =>
+        new ListSpaceIncidentsHandler(container.resolve<IncidentReader>('incidentRepository')));
+
+    container.register('queryBus', (): QueryBusService => {
+        const bus: QueryBusService = new QueryBusService();
+        bus.register(container.resolve<ListSpacesHandler>('listSpacesHandler'));
+        bus.register(container.resolve<GetSpaceHandler>('getSpaceHandler'));
+        bus.register(container.resolve<FindAvailableSpacesHandler>('findAvailableSpacesHandler'));
+        bus.register(container.resolve<GetReservationHandler>('getReservationHandler'));
+        bus.register(container.resolve<ListUserReservationsHandler>('listUserReservationsHandler'));
+        bus.register(container.resolve<GetIncidentHandler>('getIncidentHandler'));
+        bus.register(container.resolve<ListSpaceIncidentsHandler>('listSpaceIncidentsHandler'));
+        return bus;
+    });
 
     container.register('reservationRoutes', (): Router =>
         createReservationRoutes(
@@ -146,6 +205,9 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
 
     container.register('incidentRoutes', (): Router =>
         createIncidentRoutes(container.resolve<IncidentController>('incidentController')));
+
+    container.register('spaceRoutes', (): Router =>
+        createSpaceRoutes(container.resolve<SpaceController>('spaceController')));
 
     // §11 step 4: subscribe the notification listener to the event bus — the
     // listener is typed against the concrete event, so the literal below is
