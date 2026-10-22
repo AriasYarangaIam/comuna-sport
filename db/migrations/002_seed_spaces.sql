@@ -15,10 +15,14 @@ ON CONFLICT (id) DO UPDATE SET
     is_active  = EXCLUDED.is_active;
 
 -- One availability window per space per day, for today + the next 29 days (30 total),
--- expressed as Lima wall-clock times. The generated day comes from the server clock
--- (UTC in the official image) and is combined with the Lima-local start/end time, then
--- converted to timestamptz — every row therefore lands on a single Lima calendar day,
--- satisfying the space_availability_windows same-day CHECK.
+-- expressed as Lima wall-clock times. The 30-day range is anchored on the CURRENT
+-- America/Lima BUSINESS day — the same pinned timezone as the API (DATABASE.md §3) —
+-- so the catalog always covers the day a user is booking on. The day is resolved in
+-- Lima, NOT in the server clock: the official postgres image runs on UTC, and a
+-- UTC-anchored range would leave the current Lima business day without a window
+-- between 18:00 and 24:00 Lima. Each generated day is combined with the Lima-local
+-- start/end time and converted to timestamptz — every row therefore lands on a
+-- single Lima calendar day, satisfying the space_availability_windows same-day CHECK.
 -- The id derives from (space_id, day) so re-running the seed is a no-op that
 -- still REFRESHES the catalog (a deactivated space is reactivated, the price and
 -- the window bounds are restored).
@@ -50,7 +54,11 @@ FROM (
         ('33333333-3333-4333-8333-333333333333'::uuid, TIME '09:00', TIME '23:00'),
         ('44444444-4444-4444-8444-444444444444'::uuid, TIME '06:00', TIME '23:00')
 ) AS s (id, start_time, end_time)
-CROSS JOIN generate_series(current_date, current_date + 29, interval '1 day') AS days (day)
+CROSS JOIN generate_series(
+    (now() AT TIME ZONE 'America/Lima')::date,
+    (now() AT TIME ZONE 'America/Lima')::date + 29,
+    interval '1 day'
+) AS days (day)
 ON CONFLICT (id) DO UPDATE SET
     window_start = EXCLUDED.window_start,
     window_end   = EXCLUDED.window_end;
