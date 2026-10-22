@@ -105,6 +105,21 @@ Inline (no writer delegation), with evidence:
     — the two adapters now materialise byte-identical windows, not merely equivalent
     behaviour. The catalog opens on `2026-10-21` (the current Lima business day) and
     covers 30 consecutive business days.
+  - Adversarial probe of the migration (the risk item): the shipped
+    `003_tighten_incidents.sql` was executed against a table whose `state` column had
+    been made nullable again and seeded with one offending row. It **refused** —
+    `003_tighten_incidents: refusing to SET NOT NULL — incidents holds 1 row(s) with NULL
+    in reporter_id, description or state; repair those rows and re-run` — the offending
+    row survived, the column stayed nullable (no partial application), and re-running
+    the file on a clean table succeeded twice in a row (idempotent). The probe row was
+    deleted and the shipped file re-applied, leaving the live schema exactly as
+    committed: `is_nullable = 'NO'` on all three columns and 0 rows.
+  - **Independent verification: unavailable in this environment.** `gentle-ai-verify`
+    (three attempts, including a one-field health diagnostic), `review-risk` and
+    `jd-judge-a` all fail with the same opaque error, and the native review relay
+    refuses to launch any lens with `no model is configured for review-risk; assign it a
+    model in the agent model routing config`. The parent ran the spec-derived probes
+    above instead; a separate reviewer session could not be obtained.
 - **T7 — Work-unit commits** `7e04053`, `58d497d`, `eaec604` on `comuna/entities`. No
   push, no PR — both remain the user's decision.
 
@@ -150,3 +165,13 @@ the PostgreSQL seed pins fixed UUIDs. Both adapters therefore answer the same
 availability question with the same spaces but different ids. This is a pre-existing
 divergence, not part of the three authorized items, and it was left untouched: the id is
 opaque to every consumer, and the UI reads whatever id the API returns.
+
+**L9** — Native review: the lifecycle was entered (`inspect` → `start` → `status`, lineage
+`review-7a8266215bf7fffb`, tier `medium`, lenses `review-risk` + `review-readability` +
+`review-reliability`, 8 changed files, 883 changed lines) and the collect slots were
+issued, but **no reviewer could be launched**: the Pi host relay fails with
+`no model is configured for review-risk; assign it a model in the agent model routing
+config`, both for the whole group and for a single slot. The lineage is left in state
+`reviewing` with its three collect slots outstanding — nothing was submitted, so no
+authority was burned and no verdict was recorded. Releasing it needs an explicit
+operator decision.
