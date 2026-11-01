@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --dur-instant: 120ms;
+    --dur-fast: 180ms;
+    --dur-base: 240ms;
+    --dur-slow: 320ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasis: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    @apply bg-sky-200 text-sky-900;
+  }
+
+  :focus-visible {
+    outline: 2px solid #15699e;
+    outline-offset: 2px;
+  }
+
+  input,
+  button,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --border-strong: #124f77;
+    }
+
+    body {
+      background: #ffffff;
+      color: #0c1f2e;
+    }
+
+    .border,
+    .border-b,
+    .border-t,
+    .border-l,
+    .border-r {
+      border-color: #124f77 !important;
+    }
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .animate-enter {
+    animation: enter var(--dur-base) var(--ease-emphasis) both;
+  }
+
+  .animate-card-in {
+    animation: card-in var(--dur-base) var(--ease-emphasis) both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in var(--dur-fast) var(--ease-standard) both;
+  }
+}
+
+@layer components {
+  .surface-wash {
+    background-image: radial-gradient(
+      120% 90% at 50% -20%,
+      #e3f2ff 0%,
+      #f4faff 55%,
+      #f4faff 100%
+    );
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dialog-in-desktop {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Modo Lectura Fácil: tipografía base 18/28, cuerpo en peso 500 y objetivos
+   táctiles de 56 px. Se aplica sobre <html data-reading="large">. */
+html[data-reading='large'] .text-body {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+}
+
+html[data-reading='large'] .text-small {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+}
+
+html[data-reading='large'] .text-caption {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+html[data-reading='large'] button,
+html[data-reading='large'] a[data-touch-target],
+html[data-reading='large'] input,
+html[data-reading='large'] select,
+html[data-reading='large'] textarea {
+  min-height: 56px;
+}
+
+html[data-reading='large'] [data-reading-hide] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-enter,
+  .animate-card-in,
+  .animate-fade-in {
+    animation: fade-in 120ms linear both;
+  }
+}

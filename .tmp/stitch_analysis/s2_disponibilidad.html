@@ -1,0 +1,504 @@
+<!DOCTYPE html><html lang="es" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><title>ComunaSport - Plataforma Municipal Deportiva</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface-tint": "#056398",
+          "surface-bright": "#f7f9ff",
+          "sky-400": "#74BEF5",
+          "text-disabled": "#8FA6B8",
+          "info-bg": "#E3F2FF",
+          "on-primary-fixed": "#001d32",
+          "background": "#f7f9ff",
+          "surface": "#FFFFFF",
+          "on-primary-fixed-variant": "#004b74",
+          "warning-bg": "#FFF3E0",
+          "danger": "#B42318",
+          "on-error-container": "#93000a",
+          "on-secondary": "#ffffff",
+          "success": "#0E7C63",
+          "sky-500": "#3FA3E8",
+          "sky-900": "#0D3A58",
+          "secondary-container": "#59b8fe",
+          "on-secondary-container": "#00476e",
+          "on-tertiary-fixed": "#002118",
+          "on-error": "#ffffff",
+          "inverse-surface": "#163349",
+          "on-primary": "#ffffff",
+          "info": "#124F77",
+          "sky-300": "#A5D5FB",
+          "on-tertiary-container": "#97f4d5",
+          "text-primary": "#0C1F2E",
+          "secondary-fixed-dim": "#92ccff",
+          "surface-variant": "#cde5ff",
+          "outline": "#717880",
+          "inverse-primary": "#94ccff",
+          "inverse-on-surface": "#e7f2ff",
+          "tertiary": "#005744",
+          "on-surface": "#001d31",
+          "surface-dim": "#c1ddfa",
+          "primary-fixed": "#cde5ff",
+          "sky-700": "#15699E",
+          "on-primary-container": "#cbe4ff",
+          "tertiary-fixed": "#97f4d5",
+          "surface-container-lowest": "#ffffff",
+          "canvas": "#F4FAFF",
+          "surface-container-high": "#d7eaff",
+          "on-surface-variant": "#40474f",
+          "outline-variant": "#c0c7d0",
+          "tertiary-container": "#00725a",
+          "on-background": "#001d31",
+          "warning": "#9A5B00",
+          "border": "#CDE4F7",
+          "error-container": "#ffdad6",
+          "sky-50": "#F2F9FF",
+          "success-bg": "#E4F7F1",
+          "sky-800": "#124F77",
+          "on-tertiary": "#ffffff",
+          "surface-container-low": "#ecf4ff",
+          "border-strong": "#A9BDCD",
+          "surface-container-highest": "#cde5ff",
+          "primary-fixed-dim": "#94ccff",
+          "secondary-fixed": "#cce5ff",
+          "surface-container": "#e2efff",
+          "sky-600": "#1E86C9",
+          "danger-bg": "#FDECEA",
+          "sky-200": "#C9E6FE",
+          "on-secondary-fixed-variant": "#004b73",
+          "error": "#ba1a1a",
+          "primary-container": "#15699e",
+          "tertiary-fixed-dim": "#7bd8ba",
+          "on-secondary-fixed": "#001d31",
+          "text-secondary": "#56718A",
+          "on-tertiary-fixed-variant": "#00513f",
+          "secondary": "#006397",
+          "sky-100": "#E3F2FF",
+          "primary": "#00507d"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.5rem",
+          "space-lg": "1rem",
+          "margin-tablet": "1.5rem",
+          "gutter-tablet": "1.25rem",
+          "space-3xl": "3rem",
+          "gutter-mobile": "1rem",
+          "space-md": "0.75rem",
+          "space-2xl": "2rem",
+          "gutter": "1.5rem",
+          "space-xl": "1.5rem",
+          "margin-mobile": "1rem",
+          "space-sm": "0.5rem",
+          "space-4xl": "4rem",
+          "space-xs": "0.25rem"
+        },
+        "fontFamily": {
+          "headline-md": ["Inter"],
+          "headline-sm": ["Inter"],
+          "headline-lg-mobile": ["Inter"],
+          "display": ["Inter"],
+          "body-sm-medium": ["Inter"],
+          "body-lg": ["Inter"],
+          "body-sm": ["Inter"],
+          "headline-lg": ["Inter"],
+          "mono-sm": ["JetBrains Mono"],
+          "mono-xs": ["JetBrains Mono"],
+          "label-md": ["Inter"],
+          "label-sm": ["Inter"]
+        },
+        "fontSize": {
+          "headline-md": ["22px", {"lineHeight": "30px", "fontWeight": "600"}],
+          "headline-sm": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+          "headline-lg-mobile": ["22px", {"lineHeight": "30px", "fontWeight": "600"}],
+          "display": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+          "body-sm-medium": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+          "mono-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "mono-xs": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-canvas text-text-primary font-body-lg text-body-lg min-h-screen flex flex-col antialiased selection:bg-sky-200 selection:text-sky-900"><header class="fixed top-0 inset-x-0 z-50 bg-surface border-b border-border shadow-[0_1px_2px_rgba(12,31,46,0.06)]"><div class="h-16 max-w-[1280px] mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-shrink-0"><a class="flex items-center gap-2.5 focus:outline-none" data-path="explorar" href="#"><div class="w-9 h-9 rounded-full bg-sky-700 flex items-center justify-center text-on-primary shadow-sm flex-shrink-0"><span class="material-symbols-outlined text-[20px]">sports_soccer</span></div><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-text-primary tracking-tight font-semibold">ComunaSport</span><span class="text-[11px] font-label-sm font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 px-2 py-0.5 rounded border border-sky-200">MUNICIPAL</span></div></a></div><nav class="hidden md:flex items-center h-16 gap-space-xl" data-active-classes="text-sky-700 font-semibold border-b-[3px] border-sky-700"><a class="inline-flex items-center h-16 px-space-xs text-sky-700 font-semibold border-b-[3px] border-sky-700 font-body-sm-medium text-body-sm-medium transition-colors" data-path="explorar" href="#">Explorar</a><a class="inline-flex items-center h-16 px-space-xs text-text-secondary hover:text-sky-700 font-body-sm-medium text-body-sm-medium transition-colors border-b-[3px] border-transparent" data-path="mis-reservas" href="#">Mis reservas</a><a class="inline-flex items-center h-16 px-space-xs text-text-secondary hover:text-sky-700 font-body-sm-medium text-body-sm-medium transition-colors border-b-[3px] border-transparent" data-path="incidentes" href="#">Incidentes</a></nav><div class="flex items-center gap-space-sm flex-shrink-0"><button aria-label="Activar modo lectura fácil" class="inline-flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg border border-border text-text-secondary hover:text-sky-700 hover:bg-sky-50 transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">text_fields</span><span class="hidden lg:inline text-label-sm font-label-sm">Lectura fácil</span></button><a class="inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg text-sky-700 hover:bg-sky-50 hover:underline transition-colors font-body-sm-medium text-body-sm-medium" data-path="ayuda" href="#"><span class="material-symbols-outlined text-[20px]">help</span><span class="hidden sm:inline">Ayuda</span></a><div class="flex items-center gap-2 pl-2 border-l border-border"><div class="hidden sm:flex flex-col text-right"><span class="text-label-sm font-label-sm font-semibold text-text-primary leading-tight">Vecino Registrado</span><span class="text-mono-xs font-mono-xs text-text-secondary leading-tight">user-vecino-4589</span></div><div class="w-9 h-9 rounded-full bg-sky-700 text-on-primary flex items-center justify-center font-label-md font-semibold shadow-sm flex-shrink-0"><span class="material-symbols-outlined text-[20px]">person</span></div></div></div></div></header><main class="w-full flex-1 pt-16 bg-canvas pb-20 md:pb-space-3xl"><div class="flex flex-col w-full">
+<div class="max-w-[1280px] w-full mx-auto px-margin py-space-xl flex flex-col gap-space-2xl">
+<!-- 1. Cabecera y Retorno -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<a class="inline-flex items-center gap-1.5 text-sky-700 hover:text-sky-900 transition-colors font-body-sm-medium text-body-sm-medium py-1 px-2 rounded-lg hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-700" data-path="explorar" href="#">
+<svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+<span class="">Volver al catálogo de recintos</span>
+</a>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pt-space-xs">
+<div>
+<div class="inline-flex items-center gap-2 mb-1.5">
+<span class="w-2 h-2 rounded-full bg-sky-600 animate-pulse"></span>
+<span class="font-mono-xs text-mono-xs uppercase tracking-wider text-text-secondary font-medium">ComunaSport // Fase de Selección S2</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">¿Cuándo quieres jugar?</h1>
+<p class="font-body-lg text-body-lg text-text-secondary max-w-3xl mt-1">
+            Consulta disponibilidad horaria en tiempo real para las losas y canchas metropolitanas. La confirmación valida solapamientos en el servidor cívico.
+          </p>
+</div>
+<div class="flex items-center gap-2 self-start md:self-auto bg-surface px-3 py-2 rounded-xl shadow-sm">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-success"></span>
+<span class="font-mono-xs text-mono-xs text-text-secondary font-medium">Sincronizado vía API LimaDeportes</span>
+</div>
+</div>
+</section>
+<!-- 2. Barra de Control de Búsqueda y Filtros -->
+<section class="bg-surface rounded-xl p-space-xl shadow-sm">
+<form class="grid grid-cols-1 md:grid-cols-12 gap-space-lg items-end" id="filter-form">
+<!-- a) Selector de Fecha -->
+<div class="md:col-span-4 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-text-primary flex items-center justify-between" for="reservation-date">
+<span class="">Fecha de uso cívico</span>
+<span class="text-text-secondary font-mono-xs text-mono-xs">Horario diurno y vespertino</span>
+</label>
+<div class="relative flex items-center">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-sky-700">
+<svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+</div>
+<input aria-label="Fecha seleccionada" class="w-full h-11 pl-10 pr-3 rounded-lg bg-surface text-text-primary font-body-sm-medium text-body-sm-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-700 cursor-pointer" id="reservation-date" readonly="" type="text" value="Sábado, 24 de octubre de 2026">
+</div>
+</div>
+<!-- b) Duración de Reserva -->
+<div class="md:col-span-4 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-text-primary">Duración de reserva</label>
+<div aria-label="Seleccionar duración en horas" class="grid grid-cols-3 gap-1.5 p-1 bg-surface-container-low rounded-lg h-11" role="radiogroup">
+<button aria-checked="false" class="h-9 px-2 rounded font-label-md text-label-md text-text-primary hover:bg-surface transition-colors flex items-center justify-center" role="radio" type="button">
+              1 h
+            </button>
+<button aria-checked="true" class="h-9 px-2 rounded font-label-md text-label-md bg-sky-700 text-on-primary font-semibold shadow-sm transition-transform flex items-center justify-center" role="radio" type="button">
+              2 h
+            </button>
+<button aria-checked="false" class="h-9 px-2 rounded font-label-md text-label-md text-text-primary hover:bg-surface transition-colors flex items-center justify-center" role="radio" type="button">
+              3 h
+            </button>
+</div>
+</div>
+<!-- c) Filtro de Disciplina -->
+<div class="md:col-span-2 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-text-primary" for="discipline-select">Disciplina</label>
+<div class="relative">
+<select class="w-full h-11 px-3 rounded-lg bg-surface text-text-primary font-body-sm-medium text-body-sm-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-700 appearance-none cursor-pointer" id="discipline-select">
+<option selected="" value="basquet">🏀 Básquet</option>
+<option value="futsal">⚽ Futsal</option>
+<option value="voley">🏐 Vóley</option>
+<option value="todos">Todos los deportes</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-text-secondary">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</div>
+</div>
+</div>
+<!-- d) Botón de Refresco y Estado -->
+<div class="md:col-span-2">
+<button class="w-full h-11 px-4 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-label-md text-label-md flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-700" type="button">
+<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"></path>
+</svg>
+<span class="">Actualizar</span>
+</button>
+</div>
+</form>
+</section>
+<!-- 3. Riel Visual Interactivo de Franjas Horarias (08:00 a 22:00) -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-headline-sm text-headline-sm text-text-primary">Franjas horarias del día</h2>
+<span class="font-label-sm text-label-sm text-text-secondary">Sábado 24 de octubre</span>
+</div>
+<div class="hidden sm:flex items-center gap-space-md text-label-sm font-label-sm">
+<span class="inline-flex items-center gap-1.5 text-text-secondary">
+<span class="w-2.5 h-2.5 rounded-full bg-success"></span> Libre
+          </span>
+<span class="inline-flex items-center gap-1.5 text-text-secondary">
+<span class="w-2.5 h-2.5 rounded-full bg-sky-700"></span> Bloque de 2 h
+          </span>
+<span class="inline-flex items-center gap-1.5 text-text-disabled">
+<span class="w-2.5 h-2.5 rounded-full bg-border-strong"></span> Reservado
+          </span>
+</div>
+</div>
+<!-- Grid con scroll horizontal fluido -->
+<div class="overflow-x-auto pb-space-sm -mx-margin px-margin md:mx-0 md:px-0">
+<div aria-label="Franjas horarias disponibles" class="min-w-[980px] grid grid-cols-7 gap-space-sm" role="listbox">
+<!-- Franja 08:00 - 09:00 (Libre) -->
+<button class="group relative flex flex-col justify-between p-3 h-20 bg-surface rounded-xl shadow-sm hover:shadow-md transition-all text-left focus:outline-none focus:ring-2 focus:ring-sky-700" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-sm text-mono-sm font-semibold text-text-primary">08:00</span>
+<span class="w-2 h-2 rounded-full bg-success"></span>
+</div>
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-xs text-mono-xs text-text-secondary">09:00</span>
+<span class="font-label-sm text-label-sm text-success bg-success-bg px-1.5 py-0.5 rounded">Libre</span>
+</div>
+</button>
+<!-- Franja 09:00 - 10:00 (Libre) -->
+<button class="group relative flex flex-col justify-between p-3 h-20 bg-surface rounded-xl shadow-sm hover:shadow-md transition-all text-left focus:outline-none focus:ring-2 focus:ring-sky-700" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-sm text-mono-sm font-semibold text-text-primary">09:00</span>
+<span class="w-2 h-2 rounded-full bg-success"></span>
+</div>
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-xs text-mono-xs text-text-secondary">10:00</span>
+<span class="font-label-sm text-label-sm text-success bg-success-bg px-1.5 py-0.5 rounded">Libre</span>
+</div>
+</button>
+<!-- Franjas Seleccionadas: 10:00 - 12:00 (Bloque activo) -->
+<div aria-selected="true" class="col-span-2 p-3 h-20 bg-info-bg rounded-xl shadow-md flex items-center justify-between relative overflow-hidden">
+<div class="absolute -right-3 -top-3 w-16 h-16 bg-sky-200/50 rounded-full blur-sm pointer-events-none"></div>
+<div class="flex flex-col justify-between h-full z-10">
+<div class="flex items-center gap-2">
+<span class="font-mono-sm text-mono-sm font-bold text-sky-900">10:00 – 12:00</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-sky-700 text-on-primary">
+                  Activo
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-sky-800">Bloque seleccionado de 2 horas continuas</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-sky-700 text-on-primary flex items-center justify-center shadow-sm z-10 flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+</div>
+</div>
+<!-- Franja 12:00 - 13:00 (Ocupada) -->
+<div aria-disabled="true" class="flex flex-col justify-between p-3 h-20 bg-surface-container-low rounded-xl opacity-80 cursor-not-allowed select-none">
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-sm text-mono-sm font-medium text-text-disabled line-through">12:00</span>
+<svg class="w-3.5 h-3.5 text-text-disabled" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+</svg>
+</div>
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-xs text-mono-xs text-text-disabled">13:00</span>
+<span class="font-label-sm text-label-sm text-text-disabled">Ocupado</span>
+</div>
+</div>
+<!-- Franja 13:00 - 14:00 (Ocupada) -->
+<div aria-disabled="true" class="flex flex-col justify-between p-3 h-20 bg-surface-container-low rounded-xl opacity-80 cursor-not-allowed select-none">
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-sm text-mono-sm font-medium text-text-disabled line-through">13:00</span>
+<svg class="w-3.5 h-3.5 text-text-disabled" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+</svg>
+</div>
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-xs text-mono-xs text-text-disabled">14:00</span>
+<span class="font-label-sm text-label-sm text-text-disabled">Ocupado</span>
+</div>
+</div>
+<!-- Franja 14:00 - 15:00 (Libre) -->
+<button class="group relative flex flex-col justify-between p-3 h-20 bg-surface rounded-xl shadow-sm hover:shadow-md transition-all text-left focus:outline-none focus:ring-2 focus:ring-sky-700" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-sm text-mono-sm font-semibold text-text-primary">14:00</span>
+<span class="w-2 h-2 rounded-full bg-success"></span>
+</div>
+<div class="flex items-center justify-between w-full">
+<span class="font-mono-xs text-mono-xs text-text-secondary">15:00</span>
+<span class="font-label-sm text-label-sm text-success bg-success-bg px-1.5 py-0.5 rounded">Libre</span>
+</div>
+</button>
+</div>
+</div>
+</section>
+<!-- 4. Sección de Resultados para el Bloque Seleccionado -->
+<section class="flex flex-col gap-space-lg">
+<div class="flex items-center justify-between flex-wrap gap-2">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-headline-sm text-headline-sm text-text-primary">
+            Espacios disponibles para 10:00 – 12:00
+          </h2>
+<span class="font-label-sm text-label-sm text-text-secondary font-normal">(bloque de 2 horas continuas)</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-100 rounded-full text-sky-800 font-label-sm text-label-sm">
+<svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+<span class="font-semibold">1 espacio libre verificado</span>
+</div>
+</div>
+<!-- Tarjeta destacada de resultado -->
+<article class="bg-surface rounded-xl p-space-xl shadow-md hover:shadow-lg transition-all flex flex-col lg:flex-row items-stretch justify-between gap-space-xl">
+<div class="flex-1 flex flex-col justify-between gap-space-md">
+<!-- Badges de cabecera -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-info-bg text-info font-label-sm text-label-sm font-semibold">
+              🏀 BÁSQUETBOL
+            </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-bg text-success font-label-sm text-label-sm font-medium">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+              Disponible para reserva inmediata
+            </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container text-text-secondary font-mono-xs text-mono-xs">
+              ID: REC-BAR-04
+            </span>
+</div>
+<!-- Información Principal -->
+<div>
+<h3 class="font-headline-md text-headline-md text-text-primary tracking-tight">
+              Losas Comunitarias Barranco – Cancha Principal
+            </h3>
+<p class="font-body-sm text-body-sm text-text-secondary flex items-center gap-1.5 mt-1">
+<svg class="w-4 h-4 text-sky-700 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+<circle cx="12" cy="10" r="3"></circle>
+</svg>
+<span class="">Malecón Pazos s/n, Distrito de Barranco (Frente al Mirador Cívico)</span>
+</p>
+</div>
+<!-- Atributos y Aforo Municipal -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-low p-2.5 rounded-lg flex items-center gap-2">
+<svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+<circle cx="9" cy="7" r="4"></circle>
+<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+</svg>
+<div>
+<span class="block font-mono-xs text-mono-xs text-text-secondary">Aforo reglamentario</span>
+<span class="font-label-md text-label-md text-text-primary font-semibold">10 jugadores</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg flex items-center gap-2">
+<svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<rect height="18" rx="2" width="18" x="3" y="3"></rect>
+<path d="M3 9h18M9 21V9"></path>
+</svg>
+<div>
+<span class="block font-mono-xs text-mono-xs text-text-secondary">Superficie</span>
+<span class="font-label-md text-label-md text-text-primary font-semibold">Concreto pulido</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg flex items-center gap-2 col-span-2 sm:col-span-1">
+<svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+</svg>
+<div>
+<span class="block font-mono-xs text-mono-xs text-text-secondary">Iluminación LED</span>
+<span class="font-label-md text-label-md text-text-primary font-semibold">Incluida</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Columna de Tarifas y CTA -->
+<div class="w-full lg:w-80 flex flex-col justify-between p-space-lg bg-surface-container-low rounded-xl gap-space-md">
+<div class="flex flex-col gap-1.5">
+<span class="font-label-sm text-label-sm text-text-secondary">Resumen del importe municipal</span>
+<div class="flex items-baseline justify-between">
+<span class="font-body-sm text-body-sm text-text-secondary">Tarifa por bloque (2 h)</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-text-primary font-mono-sm tabular-nums">S/ 40.00 PEN</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-secondary text-right font-mono-xs tabular-nums">
+              (S/ 20.00 PEN por hora regular)
+            </span>
+<div class="mt-2 pt-2 bg-surface p-2.5 rounded-lg shadow-sm">
+<div class="flex items-center gap-1.5 text-success">
+<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+</svg>
+<span class="font-label-sm text-label-sm font-semibold">Tarifa Cívica Social</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">
+                Vecino registrado o adulto mayor aplica <span class="font-semibold text-text-primary tabular-nums">S/ 20.00 PEN</span> final con DNI validado.
+              </p>
+</div>
+</div>
+<div class="pt-2 flex flex-col gap-2">
+<button class="w-full h-12 px-6 rounded-lg bg-sky-700 hover:bg-sky-800 text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-sky-900" type="button">
+<span class="">Reservar este bloque</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<line x1="5" x2="19" y1="12" y2="12"></line>
+<polyline points="12 5 19 12 12 19"></polyline>
+</svg>
+</button>
+<p class="font-mono-xs text-mono-xs text-text-secondary text-center">
+              Paso 2 de 4: Datos del titular y DNI
+            </p>
+</div>
+</div>
+</article>
+</section>
+<!-- 5. Estado Demostrativo / Alternativo sin disponibilidad -->
+<section class="bg-canvas rounded-xl p-space-lg shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-sky-700 shrink-0">
+<svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="8" y2="12"></line>
+<line x1="12" x2="12.01" y1="16" y2="16"></line>
+</svg>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-semibold text-text-primary">
+            ¿Buscas Futsal o Vóley en este mismo horario (10:00 – 12:00)?
+          </h4>
+<p class="font-body-sm text-body-sm text-text-secondary">
+            No hay espacios libres en este bloque horario para otras disciplinas en el distrito seleccionado.
+          </p>
+</div>
+</div>
+<button class="whitespace-nowrap px-4 py-2 rounded-lg bg-surface hover:bg-sky-50 text-sky-700 font-label-md text-label-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-sky-700" type="button">
+        Ver disponibilidad para todo el día
+      </button>
+</section>
+<!-- 6. Nota Informativa y Garantía de Transparencia (InlineAlert) -->
+<section aria-label="Garantía de transparencia municipal" class="rounded-xl p-space-lg bg-info-bg shadow-sm flex items-start gap-space-md" role="note">
+<div class="w-6 h-6 text-sky-700 shrink-0 mt-0.5">
+<svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="16" y2="12"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+</svg>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<h5 class="font-label-md text-label-md font-semibold text-sky-900">
+          Transparencia y Validación de Concurrencia Cívica
+        </h5>
+<p class="font-body-sm text-body-sm text-sky-800 leading-relaxed">
+          La disponibilidad mostrada es en tiempo real. El servidor municipal valida formalmente el solapamiento al momento de confirmar en el paso siguiente: si otro vecino reserva simultáneamente la misma franja, el sistema te advertirá al instante y te ofrecerá alternativas sin penalidad alguna, según la Ordenanza Municipal de Acceso Equitativo al Deporte Metropolitano N° 2184-MML.
+        </p>
+<div class="flex items-center gap-space-md pt-1 font-mono-xs text-mono-xs text-sky-700">
+<span class="">Tasa de respuesta: 120ms</span>
+<span class="">•</span>
+<span class="">Cifrado TLS 1.3 activo</span>
+<span class="">•</span>
+<span class="">Sesión segura: CIV-LMA-9921</span>
+</div>
+</div>
+</section>
+</div>
+</div></main><nav class="md:hidden fixed bottom-0 inset-x-0 h-16 bg-surface border-t border-border z-40 flex items-center justify-around px-margin-mobile shadow-[0_-2px_8px_rgba(12,31,46,0.04)]" data-active-classes="text-sky-700 font-semibold"><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="explorar" href="#"><span class="material-symbols-outlined text-[22px]">sports_soccer</span><span class="text-[11px] font-label-sm">Explorar</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="mis-reservas" href="#"><span class="material-symbols-outlined text-[22px]">calendar_month</span><span class="text-[11px] font-label-sm">Mis reservas</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="incidentes" href="#"><span class="material-symbols-outlined text-[22px]">report</span><span class="text-[11px] font-label-sm">Incidentes</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="ayuda" href="#"><span class="material-symbols-outlined text-[22px]">help</span><span class="text-[11px] font-label-sm">Ayuda</span></a></nav><footer class="hidden md:block w-full bg-surface border-t border-border mt-auto"><div class="max-w-[1280px] mx-auto px-margin py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-lg"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg w-full"><div class="flex items-start gap-3"><div class="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center text-sky-700 flex-shrink-0 mt-0.5"><span class="material-symbols-outlined text-[24px]">account_balance</span></div><div class="flex flex-col"><span class="font-headline-sm text-body-lg font-semibold text-text-primary leading-snug">Municipalidad Metropolitana de Lima</span><span class="font-body-sm text-body-sm text-text-secondary">ComunaSport — Plataforma de Gestión Cívica Deportiva y Atención al Vecino</span><span class="font-mono-xs text-mono-xs text-text-disabled mt-1">© 2025 Municipalidad Metropolitana de Lima. Todos los derechos reservados.</span></div></div><div class="flex flex-wrap items-center gap-space-lg text-body-sm font-body-sm text-text-secondary"><a class="hover:text-sky-700 hover:underline transition-colors" data-path="terminos-y-condiciones" href="#">Términos y Condiciones</a><a class="hover:text-sky-700 hover:underline transition-colors" data-path="politica-de-privacidad" href="#">Política de Privacidad</a><a class="inline-flex items-center gap-1 hover:text-sky-700 hover:underline transition-colors" data-path="transparencia" href="#"><span class="">Portal de Transparencia</span><span class="material-symbols-outlined text-[16px]">open_in_new</span></a></div></div></div></footer>
+
+</body></html>
