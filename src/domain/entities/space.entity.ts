@@ -49,6 +49,34 @@ export class Space {
             params.availabilityWindows);
     }
     
+    static fromPersistence(params: {
+        id: SpaceId;
+        name: string;
+        type: SpaceType;
+        capacity: number;
+        basePrice: Cost;
+        availabilityWindows: TimeSlot[];
+        isActive: boolean;
+    }): Space {
+
+        if(params.name.length < 1 || params.name.length > 200) {
+            throw new Error('The name must be between 1 and 200 characters long');
+        }
+        if (params.capacity <= 0) {
+            throw new Error('The capacity must be greater than 0');
+        }
+        // An empty availabilityWindows array is allowed here on purpose: a row can
+        // be loaded before its window rows, and listing endpoints do not need them.
+
+        return new Space(params.id,
+            params.name,
+            params.type,
+            params.capacity,
+            params.basePrice,
+            params.availabilityWindows,
+            params.isActive);
+    }
+
     isSlotWithinAvailability(slot: TimeSlot): boolean {
         return this.availabilityWindows.some(w => 
             slot.start >= w.start && slot.end <= w.end

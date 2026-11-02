@@ -45,6 +45,30 @@ export class Reservation {
         );
     }
 
+    static fromPersistence(params: {
+        id: ReservationId;
+        spaceId: SpaceId;
+        userId: string;
+        timeSlot: TimeSlot;
+        cost: Cost;
+        role: UserRole;
+        createdAt: Date;
+        isActive: boolean;
+    }): Reservation {
+
+        if (params.userId.length < 1) throw new Error('The user id does not accept empty value');
+
+        return new Reservation(params.id,
+            params.spaceId,
+            params.userId,
+            params.timeSlot,
+            params.cost,
+            params.role,
+            params.createdAt,
+            params.isActive
+        );
+    }
+
     cancel(): void {
         if (!this._isActive) throw new Error('reservation already cancelled');
         this._isActive = false;

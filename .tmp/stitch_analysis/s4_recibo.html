@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="es" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><title>ComunaSport - Plataforma Municipal Deportiva</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface-tint": "#056398",
+          "surface-bright": "#f7f9ff",
+          "sky-400": "#74BEF5",
+          "text-disabled": "#8FA6B8",
+          "info-bg": "#E3F2FF",
+          "on-primary-fixed": "#001d32",
+          "background": "#f7f9ff",
+          "surface": "#FFFFFF",
+          "on-primary-fixed-variant": "#004b74",
+          "warning-bg": "#FFF3E0",
+          "danger": "#B42318",
+          "on-error-container": "#93000a",
+          "on-secondary": "#ffffff",
+          "success": "#0E7C63",
+          "sky-500": "#3FA3E8",
+          "sky-900": "#0D3A58",
+          "secondary-container": "#59b8fe",
+          "on-secondary-container": "#00476e",
+          "on-tertiary-fixed": "#002118",
+          "on-error": "#ffffff",
+          "inverse-surface": "#163349",
+          "on-primary": "#ffffff",
+          "info": "#124F77",
+          "sky-300": "#A5D5FB",
+          "on-tertiary-container": "#97f4d5",
+          "text-primary": "#0C1F2E",
+          "secondary-fixed-dim": "#92ccff",
+          "surface-variant": "#cde5ff",
+          "outline": "#717880",
+          "inverse-primary": "#94ccff",
+          "inverse-on-surface": "#e7f2ff",
+          "tertiary": "#005744",
+          "on-surface": "#001d31",
+          "surface-dim": "#c1ddfa",
+          "primary-fixed": "#cde5ff",
+          "sky-700": "#15699E",
+          "on-primary-container": "#cbe4ff",
+          "tertiary-fixed": "#97f4d5",
+          "surface-container-lowest": "#ffffff",
+          "canvas": "#F4FAFF",
+          "surface-container-high": "#d7eaff",
+          "on-surface-variant": "#40474f",
+          "outline-variant": "#c0c7d0",
+          "tertiary-container": "#00725a",
+          "on-background": "#001d31",
+          "warning": "#9A5B00",
+          "border": "#CDE4F7",
+          "error-container": "#ffdad6",
+          "sky-50": "#F2F9FF",
+          "success-bg": "#E4F7F1",
+          "sky-800": "#124F77",
+          "on-tertiary": "#ffffff",
+          "surface-container-low": "#ecf4ff",
+          "border-strong": "#A9BDCD",
+          "surface-container-highest": "#cde5ff",
+          "primary-fixed-dim": "#94ccff",
+          "secondary-fixed": "#cce5ff",
+          "surface-container": "#e2efff",
+          "sky-600": "#1E86C9",
+          "danger-bg": "#FDECEA",
+          "sky-200": "#C9E6FE",
+          "on-secondary-fixed-variant": "#004b73",
+          "error": "#ba1a1a",
+          "primary-container": "#15699e",
+          "tertiary-fixed-dim": "#7bd8ba",
+          "on-secondary-fixed": "#001d31",
+          "text-secondary": "#56718A",
+          "on-tertiary-fixed-variant": "#00513f",
+          "secondary": "#006397",
+          "sky-100": "#E3F2FF",
+          "primary": "#00507d"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.5rem",
+          "space-lg": "1rem",
+          "margin-tablet": "1.5rem",
+          "gutter-tablet": "1.25rem",
+          "space-3xl": "3rem",
+          "gutter-mobile": "1rem",
+          "space-md": "0.75rem",
+          "space-2xl": "2rem",
+          "gutter": "1.5rem",
+          "space-xl": "1.5rem",
+          "margin-mobile": "1rem",
+          "space-sm": "0.5rem",
+          "space-4xl": "4rem",
+          "space-xs": "0.25rem"
+        },
+        "fontFamily": {
+          "headline-md": ["Inter"],
+          "headline-sm": ["Inter"],
+          "headline-lg-mobile": ["Inter"],
+          "display": ["Inter"],
+          "body-sm-medium": ["Inter"],
+          "body-lg": ["Inter"],
+          "body-sm": ["Inter"],
+          "headline-lg": ["Inter"],
+          "mono-sm": ["JetBrains Mono"],
+          "mono-xs": ["JetBrains Mono"],
+          "label-md": ["Inter"],
+          "label-sm": ["Inter"]
+        },
+        "fontSize": {
+          "headline-md": ["22px", {"lineHeight": "30px", "fontWeight": "600"}],
+          "headline-sm": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+          "headline-lg-mobile": ["22px", {"lineHeight": "30px", "fontWeight": "600"}],
+          "display": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+          "body-sm-medium": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+          "mono-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "mono-xs": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+          "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-canvas text-text-primary font-body-lg text-body-lg min-h-screen flex flex-col antialiased selection:bg-sky-200 selection:text-sky-900"><header class="fixed top-0 inset-x-0 z-50 bg-surface border-b border-border shadow-[0_1px_2px_rgba(12,31,46,0.06)]"><div class="h-16 max-w-[1280px] mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-shrink-0"><a class="flex items-center gap-2.5 focus:outline-none" data-path="explorar" href="#"><div class="w-9 h-9 rounded-full bg-sky-700 flex items-center justify-center text-white shadow-sm flex-shrink-0"><span class="material-symbols-outlined text-[20px]">sports_soccer</span></div><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-text-primary tracking-tight font-semibold">ComunaSport</span><span class="hidden sm:inline-block text-[11px] font-label-sm font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full border border-sky-200">Municipal</span></div></a></div><nav class="hidden md:flex items-center h-16 gap-space-xl" data-active-classes="text-sky-700 font-semibold border-b-[3px] border-sky-700"><a class="inline-flex items-center h-16 px-space-xs text-text-secondary hover:text-sky-700 font-body-sm-medium text-body-sm-medium transition-colors border-b-[3px] border-transparent" data-path="explorar" href="#">Explorar</a><a class="inline-flex items-center h-16 px-space-xs text-sky-700 font-semibold border-b-[3px] border-sky-700 font-body-sm-medium text-body-sm-medium transition-colors" data-path="mis-reservas" href="#">Mis reservas</a><a class="inline-flex items-center h-16 px-space-xs text-text-secondary hover:text-sky-700 font-body-sm-medium text-body-sm-medium transition-colors border-b-[3px] border-transparent" data-path="incidentes" href="#">Incidentes</a></nav><div class="flex items-center gap-space-md flex-shrink-0"><div class="flex items-center gap-space-sm"><button aria-label="Activar modo lectura fácil" class="inline-flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg border border-border text-text-secondary hover:text-sky-700 hover:bg-sky-50 transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">text_fields</span><span class="hidden lg:inline text-label-sm font-label-sm">Lectura fácil</span></button><a class="inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg text-sky-700 hover:bg-sky-50 hover:underline transition-colors font-body-sm-medium text-body-sm-medium" data-path="ayuda" href="#"><span class="material-symbols-outlined text-[20px]">help</span><span class="hidden sm:inline">Ayuda</span></a></div><div class="h-6 w-px bg-border hidden sm:block"></div><div class="flex items-center gap-2.5"><div class="hidden sm:flex flex-col text-right"><span class="text-[11px] font-label-sm text-text-secondary font-medium leading-none">Vecino Registrado</span><span class="font-mono-xs text-mono-xs text-sky-900 font-semibold leading-tight">user-vecino-4589</span></div><div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-sm border border-sky-200"><span class="material-symbols-outlined text-on-primary text-[20px]">person</span></div></div></div></div></header><main class="w-full flex-1 pt-16 bg-canvas pb-20 md:pb-space-3xl"><div class="flex flex-col w-full">
+<div class="max-w-[800px] mx-auto w-full px-margin py-space-xl sm:py-space-2xl">
+<!-- Miga de pan sutil y accesible -->
+<div class="mb-space-lg">
+<a class="inline-flex items-center gap-1.5 text-text-secondary hover:text-sky-700 font-body-sm-medium text-body-sm-medium transition-colors group" data-path="mis-reservas" href="#">
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5">arrow_back</span>
+<span class="">Volver a Mis reservas</span>
+</a>
+</div>
+<!-- Encabezado de confirmación con éxito prominente -->
+<div class="flex flex-col items-center text-center mb-space-2xl">
+<div class="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-success-bg flex items-center justify-center mb-space-md shadow-sm">
+<div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-success text-[36px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-success-bg text-success font-label-sm text-label-sm mb-2">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+        HTTP 201 Created · Registro Exitoso
+      </span>
+<h1 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">
+        Reserva confirmada
+      </h1>
+<p class="font-body-lg text-body-lg text-text-secondary mt-1 max-w-[560px]">
+        Tu solicitud ha sido validada y registrada en el sistema de gestión cívica deportiva de la Municipalidad Metropolitana de Lima.
+      </p>
+</div>
+<!-- Tarjeta Central: Comprobante / Recibo Digital Oficial -->
+<section aria-label="Comprobante digital de reserva" class="bg-surface rounded-xl shadow-[0_8px_24px_rgba(18,79,119,0.08)] overflow-hidden transition-all">
+<!-- Banda superior decorativa institucional -->
+<div class="bg-sky-900 px-space-xl py-space-md flex flex-wrap items-center justify-between gap-space-sm text-on-primary">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-sky-300">verified</span>
+<span class="font-label-md text-label-md tracking-wider uppercase font-semibold text-white">Comprobante Oficial Electrónico</span>
+</div>
+<div class="flex items-center gap-1.5 font-mono-xs text-mono-xs text-sky-200 bg-sky-800/60 px-2.5 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+<span class="">VAL-MUNILIMA-2026</span>
+</div>
+</div>
+<div class="p-space-lg sm:p-space-2xl flex flex-col gap-space-xl">
+<!-- Cabecera del espacio reservado -->
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-md">
+<div class="space-y-1.5 flex-1 min-w-0">
+<div class="flex flex-wrap items-center gap-2 mb-1">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-700 font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">sports_soccer</span>
+                Fútbol 11
+              </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-success-bg text-success font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                Activa · 24 oct 2026, 09:58 (America/Lima)
+              </span>
+</div>
+<h2 class="font-headline-md text-headline-md text-sky-900 tracking-tight font-semibold">
+              Cancha de Veteranos Miraflores
+            </h2>
+<div class="flex flex-col gap-1 text-text-secondary font-body-sm text-body-sm">
+<div class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-sky-600 flex-shrink-0 mt-0.5">location_on</span>
+<span class="">Av. del Ejército 1250, Miraflores, Lima</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-sky-600 flex-shrink-0">calendar_today</span>
+<span class="">Sábado, 24 de octubre de 2026 · 10:00 – 12:00 (2 horas)</span>
+</div>
+</div>
+</div>
+<!-- Miniatura visual del recinto -->
+<div class="w-full sm:w-28 h-20 rounded-lg overflow-hidden bg-sky-100 flex-shrink-0 relative shadow-inner">
+<img class="w-full h-full object-cover" data-alt="Vista horizontal en ángulo bajo de una cancha de fútbol 11 municipal impecable con césped sintético verde brillante, líneas blancas pintadas a la perfección, arcos con redes tensas y el horizonte costero de Miraflores bajo la luz clara de la mañana en Lima." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWQu2ZJ8Iy-fIVQqZe1fKyGQsMjLG9Eh_sOAuFj-Ttmdeai4JenXsPLLpFVvDQvdLYANcwGN4IBQ0ZiR2zM-ek4JSiBPSaOlYPLCRmgCxSbGbcogqpNHf836alFj8KGhh4-36ETnT4bgjROLtNTaVVySdbMHWxrKO4oP1sekCeEvH0WBWH6mADSvdB15nyuFb9Vre_ccLXijNc60PyNq4SKakmzfy8lFQ1EJgEAJDV5V20zmdgy2k">
+<div class="absolute inset-0 bg-gradient-to-t from-sky-950/40 to-transparent"></div>
+<span class="absolute bottom-1 right-1.5 text-[10px] font-label-sm text-white font-medium bg-black/40 px-1.5 py-0.5 rounded">Cancha 01</span>
+</div>
+</div>
+<div class="h-px w-full bg-border"></div>
+<!-- Código único de reserva (UUID) & Trazabilidad Idempotente -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider font-semibold">
+              Código de reserva oficial (UUID)
+            </span>
+<span class="font-mono-xs text-mono-xs text-text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-success">lock</span>
+              Firma digital certificada
+            </span>
+</div>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-2.5 rounded-lg bg-canvas">
+<div class="flex items-center gap-2 min-w-0 px-2 py-1">
+<span class="material-symbols-outlined text-sky-700 text-[20px] flex-shrink-0">tag</span>
+<code class="font-mono-sm text-mono-sm text-sky-900 font-semibold select-all truncate" id="res-uuid">
+                7f3c2b1a-9d4e-4c8b-8a11-2f6e9d0c4b77
+              </code>
+</div>
+<button class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-surface hover:bg-sky-50 text-sky-700 rounded-lg font-body-sm-medium text-body-sm-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-sky-700" id="copy-btn" onclick="copyReservationCode()" type="button">
+<span class="material-symbols-outlined text-[18px]" id="copy-icon">content_copy</span>
+<span id="copy-text" class="">Copiar código</span>
+</button>
+</div>
+<p class="font-mono-xs text-mono-xs text-text-disabled truncate pl-1">
+            Idempotency-Key: <span class="text-text-secondary">9b1deb4d-3f82-411a-bf72-8a902dfccb6d</span>
+</p>
+</div>
+<div class="h-px w-full bg-border"></div>
+<!-- Desglose de tarifa (PriceSummary) con números tabulares -->
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-text-primary font-semibold">
+              Desglose de tarifa pública
+            </h3>
+<span class="font-label-sm text-label-sm text-sky-700 font-medium bg-sky-50 px-2 py-0.5 rounded">
+              TUPA Art. 44 - Deporte Cívico
+            </span>
+</div>
+<div class="bg-surface-tint rounded-lg p-space-md sm:p-space-lg space-y-2.5">
+<div class="flex items-center justify-between font-body-sm text-body-sm text-text-secondary">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-disabled">schedule</span>
+                Precio base del espacio (bloque 2 h)
+              </span>
+<span class="font-mono-sm text-mono-sm text-text-primary [font-variant-numeric:tabular-nums]">
+                S/ 100.00 PEN
+              </span>
+</div>
+<div class="flex items-center justify-between font-body-sm text-body-sm text-success">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+                Beneficio Adulto Mayor (−50 %)
+              </span>
+<span class="font-mono-sm text-mono-sm font-semibold [font-variant-numeric:tabular-nums]">
+                −S/ 50.00 PEN
+              </span>
+</div>
+<div class="flex items-center justify-between font-body-sm text-body-sm text-text-secondary">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-text-disabled">wb_incandescent</span>
+                Iluminación deportiva e instalaciones
+              </span>
+<span class="font-mono-sm text-mono-sm text-sky-700 [font-variant-numeric:tabular-nums]">
+                Incluido (S/ 0.00 PEN)
+              </span>
+</div>
+<div class="h-px w-full bg-border pt-1"></div>
+<div class="flex items-center justify-between pt-1">
+<div>
+<span class="block font-headline-sm text-headline-sm text-sky-900 font-semibold tracking-tight">
+                  TOTAL PAGADO / ACREDITADO
+                </span>
+<span class="font-label-sm text-label-sm text-text-secondary">
+                  Canal de pago: Tarjeta de Débito (Visa Débito ···· 4182)
+                </span>
+</div>
+<div class="text-right">
+<span class="font-headline-md text-headline-md text-sky-900 font-bold [font-variant-numeric:tabular-nums]">
+                  S/ 50.00 PEN
+                </span>
+<span class="block font-label-sm text-label-sm text-success font-semibold">Exonerado IGV (Ley 28036)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Alerta informativa de notificación y acceso al recinto -->
+<div class="rounded-lg bg-info-bg p-space-md flex items-start gap-space-md">
+<div class="p-2 rounded-full bg-surface text-sky-700 flex-shrink-0 shadow-sm mt-0.5">
+<span class="material-symbols-outlined text-[20px]">mark_email_read</span>
+</div>
+<div class="flex-1 text-body-sm font-body-sm text-sky-900 leading-relaxed">
+<span class="font-semibold block text-sky-900 mb-0.5">Comprobante y accesos remitidos</span>
+            Enviamos la confirmación oficial y comprobante digital a tu correo registrado y por notificación push. Presenta tu DNI físico o este código de confirmación digital al ingresar con tu equipo al complejo deportivo.
+          </div>
+</div>
+<!-- Bloque inferior de autenticidad institucional y QR -->
+<div class="p-space-md rounded-lg bg-canvas flex flex-col sm:flex-row items-center justify-between gap-space-lg">
+<div class="flex items-center gap-space-md">
+<!-- QR Oficial Simulado -->
+<div class="w-20 h-20 bg-surface p-1.5 rounded-lg shadow-sm flex flex-col items-center justify-center flex-shrink-0">
+<svg class="w-full h-full text-sky-900" fill="currentColor" viewBox="0 0 100 100">
+<rect fill="currentColor" height="30" rx="2" width="30" x="0" y="0"></rect>
+<rect fill="white" height="20" rx="1" width="20" x="5" y="5"></rect>
+<rect fill="currentColor" height="10" width="10" x="10" y="10"></rect>
+<rect fill="currentColor" height="30" rx="2" width="30" x="70" y="0"></rect>
+<rect fill="white" height="20" rx="1" width="20" x="75" y="5"></rect>
+<rect fill="currentColor" height="10" width="10" x="80" y="10"></rect>
+<rect fill="currentColor" height="30" rx="2" width="30" x="0" y="70"></rect>
+<rect fill="white" height="20" rx="1" width="20" x="5" y="75"></rect>
+<rect fill="currentColor" height="10" width="10" x="10" y="80"></rect>
+<rect height="6" width="6" x="36" y="8"></rect>
+<rect height="6" width="6" x="48" y="8"></rect>
+<rect height="6" width="8" x="40" y="20"></rect>
+<rect height="8" width="8" x="12" y="40"></rect>
+<rect height="12" width="6" x="26" y="44"></rect>
+<rect height="20" width="20" x="40" y="40"></rect>
+<rect height="6" width="8" x="66" y="40"></rect>
+<rect height="10" width="6" x="82" y="44"></rect>
+<rect height="16" width="6" x="40" y="72"></rect>
+<rect height="6" width="10" x="54" y="68"></rect>
+<rect height="6" width="16" x="70" y="76"></rect>
+<rect height="16" width="6" x="86" y="70"></rect>
+</svg>
+</div>
+<div class="space-y-1">
+<p class="font-label-md text-label-md text-sky-900 font-semibold">
+                Sello de Autenticidad Digital
+              </p>
+<p class="font-body-sm text-body-sm text-text-secondary leading-snug">
+                Municipalidad Metropolitana de Lima · Gerencia de Desarrollo Humano y Deportes. Válido sin firma manuscrita.
+              </p>
+</div>
+</div>
+<div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-1">
+<span class="inline-flex items-center gap-1 font-mono-xs text-mono-xs text-text-secondary">
+<span class="material-symbols-outlined text-[14px] text-sky-700">security</span>
+              SHA-256 Validado
+            </span>
+<span class="font-label-sm text-label-sm text-text-disabled">Emisión: 24/10/2026 09:58</span>
+</div>
+</div>
+<!-- Acciones del Recibo (Botones de 48px de alto reglamentario) -->
+<div class="pt-space-sm flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex flex-col sm:flex-row items-center gap-space-md w-full sm:w-auto">
+<a class="w-full sm:w-auto h-12 px-space-xl bg-sky-700 hover:bg-sky-800 text-on-primary rounded-lg font-body-sm-medium text-body-sm-medium inline-flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-sky-700 focus:ring-offset-2" data-path="mis-reservas" href="#">
+<span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+<span class="">Ver mis reservas</span>
+</a>
+<button class="w-full sm:w-auto h-12 px-space-lg bg-surface hover:bg-sky-50 text-sky-700 rounded-lg font-body-sm-medium text-body-sm-medium inline-flex items-center justify-center gap-2 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-sky-700" onclick="simulatePdfDownload()" type="button">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span class="">Descargar constancia (PDF)</span>
+</button>
+</div>
+<a class="text-sky-700 hover:text-sky-800 hover:underline font-body-sm-medium text-body-sm-medium py-2 px-1 transition-colors" data-path="explorar" href="#">
+            Reservar otro horario
+          </a>
+</div>
+</div>
+</section>
+<!-- Indicador de accesibilidad cívica -->
+<div class="mt-space-xl text-center">
+<p class="font-body-sm text-body-sm text-text-secondary inline-flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-text-disabled">support_agent</span>
+        ¿Tienes dudas o inconvenientes con tu reserva? 
+        <a class="text-sky-700 underline font-body-sm-medium hover:text-sky-800" data-path="ayuda" href="#">
+          Contáctate con Mesa de Ayuda Municipal
+        </a>
+</p>
+</div>
+</div>
+</div>
+<script>
+  function copyReservationCode() {
+    const code = document.getElementById('res-uuid').innerText.trim();
+    navigator.clipboard.writeText(code).then(() => {
+      const btnText = document.getElementById('copy-text');
+      const btnIcon = document.getElementById('copy-icon');
+      
+      btnText.innerText = '¡Copiado!';
+      btnIcon.innerText = 'check';
+      btnIcon.classList.add('text-success');
+
+      setTimeout(() => {
+        btnText.innerText = 'Copiar código';
+        btnIcon.innerText = 'content_copy';
+        btnIcon.classList.remove('text-success');
+      }, 2500);
+    });
+  }
+
+  function simulatePdfDownload() {
+    const alertBox = document.createElement('div');
+    alertBox.className = 'fixed bottom-6 right-6 z-50 bg-sky-900 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 animate-bounce';
+    alertBox.innerHTML = `
+      <span class="material-symbols-outlined text-sky-300">downloading</span>
+      <span class="text-body-sm font-medium">Generando PDF oficial con firma digital...</span>
+    `;
+    document.body.appendChild(alertBox);
+    setTimeout(() => {
+      alertBox.innerHTML = `
+        <span class="material-symbols-outlined text-success-bg text-success">check_circle</span>
+        <span class="text-body-sm font-medium">Comprobante descargado correctamente</span>
+      `;
+      setTimeout(() => alertBox.remove(), 2500);
+    }, 1500);
+  }
+</script></main><nav class="md:hidden fixed bottom-0 inset-x-0 h-16 bg-surface border-t border-border z-40 flex items-center justify-around px-margin-mobile shadow-[0_-2px_8px_rgba(12,31,46,0.04)]" data-active-classes="text-sky-700 font-semibold"><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="explorar" href="#"><span class="material-symbols-outlined text-[22px]">sports_soccer</span><span class="text-[11px] font-label-sm">Explorar</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="mis-reservas" href="#"><span class="material-symbols-outlined text-[22px]">calendar_month</span><span class="text-[11px] font-label-sm">Mis reservas</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="incidentes" href="#"><span class="material-symbols-outlined text-[22px]">report</span><span class="text-[11px] font-label-sm">Incidentes</span></a><a class="flex flex-col items-center justify-center text-text-secondary hover:text-sky-700" data-path="ayuda" href="#"><span class="material-symbols-outlined text-[22px]">help</span><span class="text-[11px] font-label-sm">Ayuda</span></a></nav><footer class="hidden md:block w-full bg-surface border-t border-border mt-auto"><div class="max-w-[1280px] mx-auto px-margin py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-lg"><div class="flex items-center gap-space-md"><div class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700 flex-shrink-0 border border-sky-200"><span class="material-symbols-outlined text-[28px]">account_balance</span></div><div class="flex flex-col gap-0.5"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm font-semibold text-text-primary tracking-tight">Municipalidad Metropolitana de Lima</span><span class="text-[11px] font-label-sm font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 px-2 py-0.5 rounded border border-sky-200">Oficial</span></div><p class="font-body-sm text-body-sm text-text-secondary">ComunaSport — Plataforma de Gestión Cívica Deportiva y Atención al Vecino</p><p class="font-mono-xs text-mono-xs text-text-disabled mt-0.5">© 2025 Municipalidad Metropolitana de Lima. Todos los derechos reservados.</p></div></div><div class="flex flex-wrap items-center gap-space-lg text-body-sm font-body-sm-medium text-text-secondary"><a class="hover:text-sky-700 hover:underline transition-colors" data-path="terminos-y-condiciones" href="#">Términos y Condiciones</a><a class="hover:text-sky-700 hover:underline transition-colors" data-path="politica-de-privacidad" href="#">Política de Privacidad</a><a class="inline-flex items-center gap-1 hover:text-sky-700 hover:underline transition-colors" data-path="transparencia" href="#" rel="noopener noreferrer" target="_blank"><span class="">Portal de Transparencia</span><span class="material-symbols-outlined text-[16px]">open_in_new</span></a></div></div></footer>
+
+</body></html>

@@ -10,7 +10,7 @@ import { SpaceId } from "../../domain/value-objects/space-id.vo";
 import { TimeSlot } from "../../domain/value-objects/time-slot.vo";
 import { UserRole } from "../../domain/value-objects/user-role.vo";
 import { CreateReservationCommand } from "../commands/create-reservation.command";
-import { ReservationResponseDto } from "../dtos/reservation-response.dto";
+import { ReservationResponseDto, toReservationResponseDto } from "../dtos/reservation-response.dto";
 import { CommandHandler } from "../ports/command-bus.interface";
 
 export class CreateReservationHandler implements CommandHandler<CreateReservationCommand, ReservationResponseDto> {
@@ -68,23 +68,4 @@ export class CreateReservationHandler implements CommandHandler<CreateReservatio
 
         return toReservationResponseDto(reservation);
     }
-}
-
-function toReservationResponseDto(reservation: Reservation): ReservationResponseDto {
-    return {
-        id: reservation.id.value,
-        spaceId: reservation.spaceId.value,
-        userId: reservation.userId,
-        role: reservation.role.value,
-        timeSlot: {
-            start: reservation.timeSlot.start.toISOString(),
-            end: reservation.timeSlot.end.toISOString()
-        },
-        cost: {
-            amount: reservation.cost.amount,
-            currency: reservation.cost.currency
-        },
-        createdAt: reservation.createdAt.toISOString(),
-        isActive: reservation.isActive
-    };
 }

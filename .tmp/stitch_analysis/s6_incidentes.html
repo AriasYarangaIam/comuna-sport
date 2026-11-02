@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>ComunaSport - Municipalidad Metropolitana de Lima</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#E9F4FD", "primary-fixed": "#cde5ff", "on-error-container": "#93000a", "tertiary-fixed-dim": "#7bd8ba", "warning": "#9A5B00", "surface-container-high": "#d7eaff", "sky-900": "#0D3A58", "text-secondary": "#56718A", "surface-container-highest": "#cde5ff", "surface-container-lowest": "#ffffff", "error-container": "#ffdad6", "secondary-fixed": "#cce5ff", "sky-400": "#74BEF5", "sky-600": "#1E86C9", "on-primary-container": "#cbe4ff", "danger-bg": "#FDECEA", "tertiary": "#005744", "primary": "#00507d", "secondary": "#006397", "tertiary-fixed": "#97f4d5", "info-bg": "#E3F2FF", "background": "#f7f9ff", "on-background": "#001d31", "text-disabled": "#8FA6B8", "info": "#124F77", "on-secondary": "#ffffff", "sky-50": "#F2F9FF", "on-tertiary-fixed-variant": "#00513f", "on-tertiary": "#ffffff", "surface-dim": "#c1ddfa", "success-bg": "#E4F7F1", "on-surface": "#001d31", "outline": "#717880", "on-secondary-container": "#00476e", "success": "#0E7C63", "canvas": "#F4FAFF", "inverse-on-surface": "#e7f2ff", "sky-800": "#124F77", "outline-variant": "#c0c7d0", "on-primary": "#ffffff", "on-primary-fixed-variant": "#004b74", "surface-bright": "#f7f9ff", "error": "#ba1a1a", "on-tertiary-fixed": "#002118", "sky-700": "#15699E", "sky-100": "#E3F2FF", "primary-fixed-dim": "#94ccff", "primary-container": "#15699e", "surface-container-low": "#ecf4ff", "warning-bg": "#FFF3E0", "danger": "#B42318", "on-primary-fixed": "#001d32", "sky-500": "#3FA3E8", "text-primary": "#0C1F2E", "border": "#CDE4F7", "border-strong": "#A9BDCD", "surface-variant": "#cde5ff", "sky-300": "#A5D5FB", "inverse-surface": "#163349", "on-secondary-fixed-variant": "#004b73", "secondary-container": "#59b8fe", "sky-200": "#C9E6FE", "surface": "#FFFFFF", "on-secondary-fixed": "#001d31", "secondary-fixed-dim": "#92ccff", "on-surface-variant": "#40474f", "on-error": "#ffffff", "inverse-primary": "#94ccff", "on-tertiary-container": "#97f4d5", "tertiary-container": "#00725a", "surface-container": "#e2efff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-sm": "0.5rem", "margin-mobile": "1rem", "space-4xl": "4rem", "gutter-mobile": "1rem", "margin": "1.5rem", "space-2xl": "2rem", "space-3xl": "3rem", "margin-tablet": "1.5rem", "space-lg": "1rem", "gutter": "1.5rem", "space-xl": "1.5rem", "gutter-tablet": "1.25rem", "space-md": "0.75rem", "space-xs": "0.25rem" }, "fontFamily": { "body-lg": ["Inter"], "mono-xs": ["JetBrains Mono"], "body-sm-medium": ["Inter"], "headline-lg": ["Inter"], "headline-md": ["Inter"], "headline-sm": ["Inter"], "mono-sm": ["JetBrains Mono"], "body-sm": ["Inter"], "label-sm": ["Inter"], "display": ["Inter"], "label-md": ["Inter"], "headline-lg-mobile": ["Inter"] }, "fontSize": { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "mono-xs": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-sm-medium": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "30px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "mono-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "display": ["32px", { "lineHeight": "40px", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-lg-mobile": ["22px", { "lineHeight": "30px", "fontWeight": "600" }] } } } };</script></head><body class="bg-canvas text-on-surface font-body-sm text-body-sm min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(12,31,46,0.06)]"><div class="h-16 max-w-7xl mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-xl"><a class="flex items-center gap-space-sm group focus:outline-none" data-path="explorar" href="#"><div class="w-10 h-10 rounded-lg bg-sky-700 flex items-center justify-center text-on-primary shadow-[0_2px_6px_rgba(21,105,158,0.25)]"><span class="material-symbols-outlined text-[24px]">sports_soccer</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-sky-900 leading-tight tracking-tight">ComunaSport</span><span class="font-label-sm text-label-sm text-sky-700 tracking-wider font-semibold uppercase">MUNICIPAL</span></div></a><nav class="hidden md:flex items-center h-16 gap-space-lg" data-active-classes="text-sky-700 border-b-2 border-sky-700 font-body-sm-medium font-semibold"><a class="h-16 inline-flex items-center px-space-xs text-text-secondary hover:text-sky-700 transition-colors" data-path="explorar" href="#">Explorar</a><a class="h-16 inline-flex items-center px-space-xs text-text-secondary hover:text-sky-700 transition-colors" data-path="mis-reservas" href="#">Mis reservas</a><a aria-current="page" class="h-16 inline-flex items-center px-space-xs transition-colors text-sky-700 border-b-2 border-sky-700 font-body-sm-medium font-semibold" data-path="incidentes" href="#">Incidentes</a></nav></div><div class="flex items-center gap-space-md"><button class="hidden sm:inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg text-text-secondary hover:text-sky-900 hover:bg-sky-50 transition-colors focus:outline-none" title="Activar lectura accesible" type="button"><span class="material-symbols-outlined text-[20px]">format_size</span><span class="font-label-md text-label-md">Lectura fácil</span></button><a class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-lg text-sky-700 hover:bg-sky-50 font-label-md text-label-md transition-colors focus:outline-none" data-path="ayuda" href="#"><span class="material-symbols-outlined text-[18px]">help</span><span>Ayuda</span></a><div class="h-6 w-px bg-sky-200 hidden sm:block"></div><div class="flex items-center gap-space-sm pl-space-xs"><div class="hidden lg:flex flex-col text-right"><span class="font-label-sm text-label-sm text-text-primary leading-tight font-medium">Vecino Registrado</span><span class="font-mono-xs text-mono-xs text-text-secondary">user-vecino-4589</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full flex-1 pt-16 bg-canvas"><div class="max-w-7xl mx-auto px-margin pt-space-lg pb-space-xs"><nav aria-label="Miga de pan" class="flex items-center gap-space-xs text-text-secondary font-label-sm text-label-sm"><a class="hover:text-sky-700 transition-colors" data-path="explorar" href="#">Inicio</a><span class="material-symbols-outlined text-[16px] text-text-disabled">chevron_right</span><span class="hover:text-sky-700 transition-colors" data-path="incidentes">Incidentes</span><span class="material-symbols-outlined text-[16px] text-text-disabled">chevron_right</span><span aria-current="page" class="text-sky-900 font-semibold">Incidentes Comunitarios</span></nav></div><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto px-margin py-space-xl flex flex-col gap-space-2xl w-full">
+<!-- CABECERA DE SECCIÓN & ACREDITACIÓN CÍVICA -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs max-w-3xl">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-info-bg text-info font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span>Auditoría Ciudadana Activa · Ordenanza Nº 2341-MML</span>
+</span>
+<span class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-success-bg text-success font-mono-xs text-mono-xs">
+<span class="w-2 h-2 rounded-full bg-success animate-ping"></span>
+            Sincronizado con Subgerencia
+          </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-sky-900 tracking-tight">
+          Incidentes comunitarios
+        </h1>
+<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed">
+          Reporta daños o desperfectos en losas deportivas públicas y realiza auditoría ciudadana del estado de atención municipal en tiempo real.
+        </p>
+</div>
+<!-- Quick Action / Status Counter Pill -->
+<div class="bg-surface-tint rounded-xl p-space-md flex items-center gap-space-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-secondary uppercase tracking-wider">Atención promedio</span>
+<span class="font-headline-sm text-headline-sm text-sky-900 font-semibold">48 – 72 hrs</span>
+</div>
+<div class="h-8 w-px bg-border"></div>
+<div class="flex items-center gap-space-xs text-sky-700">
+<span class="material-symbols-outlined text-[24px]">balance</span>
+<span class="font-label-md text-label-md font-medium">Portal Transparente</span>
+</div>
+</div>
+</header>
+<!-- CUADRO DE ALERTA CÍVICA / AVISO INSTITUCIONAL -->
+<div class="bg-surface rounded-xl p-space-lg shadow-sm flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-800 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">policy</span>
+</div>
+<div class="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex flex-col">
+<p class="font-body-sm-medium text-body-sm-medium text-text-primary">
+            Compromiso de integridad vecinal y preservación del equipamiento metropolitano
+          </p>
+<p class="font-body-sm text-body-sm text-text-secondary">
+            Los reportes son de acceso público inmediato. La información reportada activa brigadas técnicas distritales de inspección.
+          </p>
+</div>
+<a class="inline-flex items-center gap-space-xs font-label-md text-label-md text-sky-700 hover:text-sky-900 font-semibold shrink-0" href="#">
+<span>Ver reglamento deportivo</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- SECCIÓN 1: FORMULARIO "REPORTAR UN DAÑO EN INFRAESTRUCTURA" -->
+<section aria-labelledby="form-incidente-title" class="bg-surface rounded-xl p-space-xl shadow-sm flex flex-col gap-space-xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-md bg-surface-container-low p-space-md rounded-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-11 h-11 rounded-lg bg-sky-700 text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[24px]">build_circle</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-text-primary" id="form-incidente-title">
+              Reportar un daño en infraestructura
+            </h2>
+<p class="font-label-sm text-label-sm text-text-secondary">
+              Mecanismo oficial de alerta ciudadana · Subgerencia de Deporte y Recreación
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-tint text-sky-800 font-mono-xs text-mono-xs self-start md:self-auto">
+<span class="material-symbols-outlined text-[16px] text-sky-700">lock_open_right</span>
+<span>Registro Público Auditable</span>
+</div>
+</div>
+<div class="bg-warning-bg rounded-lg p-space-md flex items-start gap-space-sm text-warning">
+<span class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">info</span>
+<p class="font-body-sm text-body-sm text-warning leading-snug">
+<strong>Aviso de responsabilidad:</strong> Cada reporte genera un código de seguimiento público auditable. La falsedad deliberada de información está sujeta a sanción cívica y suspensión de reserva deportiva comunal.
+        </p>
+</div>
+<form class="flex flex-col gap-space-lg" id="citizen-incident-form" onsubmit="event.preventDefault(); document.getElementById('report-confirmation-modal').classList.remove('hidden');">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- Campo 1: Espacio afectado -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-body-sm-medium text-body-sm-medium text-text-primary flex items-center justify-between" for="espacio-afectado">
+<span>Espacio público afectado <span class="text-danger">*</span></span>
+<span class="font-label-sm text-label-sm text-sky-700 font-normal">Sede deportiva</span>
+</label>
+<div class="relative">
+<select class="w-full h-11 px-space-md pr-10 rounded-lg bg-surface text-text-primary font-body-sm text-body-sm shadow-sm appearance-none focus:outline-none focus:bg-surface-bright transition-all" id="espacio-afectado" required="">
+<option selected="" value="miraflores-f11">Cancha de Veteranos Miraflores (Fútbol 11)</option>
+<option value="barranco-basquet">Losas Comunitarias Barranco (Básquet)</option>
+<option value="barranco-tenis">Pista Comunal Barranco (Tenis)</option>
+<option class="bg-surface-container text-text-disabled" disabled="" value="san-isidro-multiuso">
+                  Multiusos San Isidro (En mantenimiento - No recibe reportes)
+                </option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none text-[20px]">
+                expand_more
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-text-secondary">
+              Selecciona el recinto donde presenciaste el deterioro físico o desperfecto.
+            </p>
+</div>
+<!-- Campo 2: Identificador Cívico o DNI -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-body-sm-medium text-body-sm-medium text-text-primary flex items-center justify-between" for="identificador-civico">
+<span>Tu identificador cívico o DNI <span class="text-danger">*</span></span>
+<span class="font-mono-xs text-mono-xs text-text-secondary">Auditoría abierta</span>
+</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md pl-10 rounded-lg bg-surface text-text-primary font-mono-sm text-mono-sm shadow-sm focus:outline-none focus:bg-surface-bright transition-all" id="identificador-civico" required="" type="text" value="vecino-auditor-01"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sky-700 text-[18px]">
+                badge
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-text-secondary">
+              No requiere contraseña. Identifica la autoría vecinal del reporte para el seguimiento del ticket.
+            </p>
+</div>
+</div>
+<!-- Campo 3: Descripción detallada -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-body-sm-medium text-body-sm-medium text-text-primary" for="descripcion-dano">
+              ¿Qué ocurrió o qué daño identificaste? <span class="text-danger">*</span>
+</label>
+<span class="font-label-sm text-label-sm text-text-secondary" id="char-counter">
+              148 / 2000 caracteres
+            </span>
+</div>
+<textarea class="w-full p-space-md rounded-lg bg-surface text-text-primary font-body-sm text-body-sm shadow-sm focus:outline-none focus:bg-surface-bright transition-all leading-relaxed" id="descripcion-dano" maxlength="2000" oninput="document.getElementById('char-counter').textContent = `${this.value.length} / 2000 caracteres`;" placeholder="Describe claramente el elemento dañado, su ubicación exacta en la cancha y si representa un peligro inminente para los deportistas..." required="" rows="4">Tablero de básquet con fisura severa en el soporte norte, cerca del acceso peatonal a las gradas. Riesgo de desprendimiento ante uso intenso.</textarea>
+<div class="flex items-center justify-between flex-wrap gap-space-xs">
+<p class="font-label-sm text-label-sm text-text-secondary">
+              Sé específico con puntos de referencia físicos (gradas, arcos, postes de luminarias, mallas).
+            </p>
+<button class="inline-flex items-center gap-space-xs text-sky-700 hover:text-sky-900 font-label-sm text-label-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">add_a_photo</span>
+<span>Adjuntar fotografía probatoria (opcional)</span>
+</button>
+</div>
+</div>
+<!-- Fila de Envío y Compromiso Institucional -->
+<div class="pt-space-md flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm text-text-secondary max-w-xl">
+<div class="w-8 h-8 rounded-full bg-surface-tint flex items-center justify-center shrink-0 text-sky-700">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+</div>
+<p class="font-body-sm text-body-sm leading-snug">
+              Atención garantizada por la <strong>Subgerencia de Obras y Recreación en 48-72 h hábiles</strong> con notificación vecinal abierta.
+            </p>
+</div>
+<button class="w-full md:w-auto h-12 px-space-xl bg-sky-700 hover:bg-sky-800 active:bg-sky-900 text-on-primary font-label-md text-label-md font-semibold rounded-lg shadow-md transition-all flex items-center justify-center gap-space-sm group focus:outline-none" type="submit">
+<span>Enviar reporte cívico</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">send</span>
+</button>
+</div>
+</form>
+</section>
+<!-- SECCIÓN 2: SEGUIMIENTO Y CICLO DE VIDA CÍVICO (§6.3) -->
+<section aria-labelledby="ciclo-vida-title" class="flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-6 rounded-full bg-sky-700"></span>
+<h2 class="font-headline-md text-headline-md text-text-primary" id="ciclo-vida-title">
+            Seguimiento y ciclo de vida de incidentes
+          </h2>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary">
+          Trazabilidad pública del flujo operativo municipal desde la radicación hasta el peritaje y entrega de obra.
+        </p>
+</div>
+<!-- RIEL DE ESTADOS INFORMATIVO (HORIZONTAL ESTILIZADO) -->
+<div class="bg-surface rounded-xl p-space-xl shadow-sm flex flex-col gap-space-xl overflow-hidden">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-space-xs text-text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-sky-700 text-[20px]">alt_route</span>
+<span class="font-semibold">Riel Metropolitano de Atención Técnica</span>
+</div>
+<span class="font-mono-xs text-mono-xs text-text-secondary bg-surface-tint px-space-sm py-space-xs rounded">
+            Protocolo ST-MML-2026-v2
+          </span>
+</div>
+<!-- Riel Principal Lineal (3 Nodos Activos / Positivos) -->
+<div class="relative pt-space-xs">
+<!-- Línea base conectora horizontal -->
+<div class="hidden md:block absolute top-6 left-12 right-12 h-1 bg-surface-variant z-0"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xl relative z-10">
+<!-- Nodo 1: En Revisión (Activo en reporte reciente) -->
+<div class="flex flex-col items-start md:items-center text-left md:text-center gap-space-sm group">
+<div class="w-12 h-12 rounded-full bg-sky-700 text-on-primary flex items-center justify-center shadow-md relative">
+<span class="material-symbols-outlined text-[24px]">manage_search</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-secondary-container rounded-full border-2 border-surface animate-pulse"></span>
+</div>
+<div class="flex flex-col items-start md:items-center gap-1">
+<span class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-info-bg text-info font-label-sm text-label-sm font-semibold">
+                  1. En revisión
+                </span>
+<span class="font-body-sm-medium text-body-sm-medium text-text-primary">
+                  Recepción y verificación técnica
+                </span>
+<p class="font-label-sm text-label-sm text-text-secondary max-w-xs">
+                  Inspección ocular in situ por brigadista acreditado en un plazo máximo de 48 horas.
+                </p>
+</div>
+</div>
+<!-- Nodo 2: Aprobado -->
+<div class="flex flex-col items-start md:items-center text-left md:text-center gap-space-sm">
+<div class="w-12 h-12 rounded-full bg-surface text-sky-600 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[24px]">construction</span>
+</div>
+<div class="flex flex-col items-start md:items-center gap-1">
+<span class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-tint text-sky-800 font-label-sm text-label-sm font-medium">
+                  2. Aprobado
+                </span>
+<span class="font-body-sm-medium text-body-sm-medium text-text-primary">
+                  Programación de refacción
+                </span>
+<p class="font-label-sm text-label-sm text-text-secondary max-w-xs">
+                  Asignación de cuadrilla presupuestaria y materiales homologados para restauración.
+                </p>
+</div>
+</div>
+<!-- Nodo 3: Resuelto -->
+<div class="flex flex-col items-start md:items-center text-left md:text-center gap-space-sm">
+<div class="w-12 h-12 rounded-full bg-success-bg text-success flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[24px]">task_alt</span>
+</div>
+<div class="flex flex-col items-start md:items-center gap-1">
+<span class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-success-bg text-success font-label-sm text-label-sm font-semibold">
+                  3. Resuelto
+                </span>
+<span class="font-body-sm-medium text-body-sm-medium text-text-primary">
+                  Obra concluida y entregada
+                </span>
+<p class="font-label-sm text-label-sm text-text-secondary max-w-xs">
+                  Acta de conformidad firmada por fiscalización municipal y habilitación deportiva comunal.
+                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Rama Secundaria Desviada: Rechazado (Estado Terminal) -->
+<div class="pt-space-md flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md bg-surface-container-low p-space-md rounded-xl">
+<div class="flex items-start md:items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-danger-bg text-danger flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">cancel</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-md text-label-md font-semibold text-danger">Rama terminal: Rechazado (cerrado)</span>
+<span class="font-mono-xs text-mono-xs px-space-xs bg-danger-bg text-danger rounded">Fin de vía</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary">
+                No imputable, duplicado técnico o improcedente. Se emite resolución fundamentada archivada en el portal público.
+              </p>
+</div>
+</div>
+<div class="bg-surface px-space-md py-space-xs rounded-lg text-text-secondary font-mono-xs text-mono-xs self-stretch md:self-auto text-center md:text-right">
+            Disposición Área Técnica · GOB-LIMA
+          </div>
+</div>
+<div class="bg-info-bg rounded-lg p-space-md flex items-center gap-space-sm text-info">
+<span class="material-symbols-outlined text-[20px] shrink-0">visibility</span>
+<p class="font-body-sm text-body-sm leading-snug">
+<strong>Transparencia pública:</strong> La transición de estados es de gestión exclusiva de la Subgerencia Municipal. Cualquier vecino puede auditar las evidencias de resolución sin registrar credenciales privadas.
+          </p>
+</div>
+</div>
+<!-- LISTADO DE REPORTES REGISTRADOS (GET /spaces/:id/incidents) -->
+<div class="flex flex-col gap-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-text-primary">
+              Reportes auditables en curso
+            </h3>
+<span class="px-space-sm py-0.5 rounded-full bg-sky-200 text-sky-900 font-mono-xs text-mono-xs font-semibold">
+              2 registrados en recinto
+            </span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface text-text-secondary hover:text-sky-700 font-label-sm text-label-sm transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+<span>Todos los estados</span>
+</button>
+<button class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface text-text-secondary hover:text-sky-700 font-label-sm text-label-sm transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Descargar CSV cívico</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-space-lg">
+<!-- TARJETA 1: REPORTE RECIENTE (EN REVISIÓN) -->
+<article class="bg-surface rounded-xl p-space-xl shadow-sm hover:shadow-md transition-shadow flex flex-col gap-space-md">
+<!-- Header de Tarjeta -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-sky-700 font-semibold tracking-wide uppercase">
+                  Espacio Deportivo
+                </span>
+<h4 class="font-headline-sm text-headline-sm text-text-primary">
+                  Cancha de Veteranos Miraflores
+                </h4>
+</div>
+<!-- Insignia de estado: En revisión -->
+<div class="flex items-center gap-space-sm self-start sm:self-auto">
+<span class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-warning-bg text-warning font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>En revisión</span>
+</span>
+</div>
+</div>
+<!-- Código de seguimiento con botón de copiado -->
+<div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg w-fit">
+<span class="font-label-sm text-label-sm text-text-secondary">Código único:</span>
+<span class="font-mono-sm text-mono-sm text-sky-900 font-semibold select-all">
+                #f7e8d9c0…4b32
+              </span>
+<button class="p-1 text-text-secondary hover:text-sky-700 rounded transition-colors" onclick="navigator.clipboard.writeText('f7e8d9c0-3b1a-4a8e-9c12-8d7e6f5a4b32'); alert('Código copiado al portapapeles: f7e8d9c0-3b1a-4a8e-9c12-8d7e6f5a4b32');" title="Copiar código completo" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<!-- Descripción del Daño -->
+<p class="font-body-lg text-body-lg text-text-primary leading-relaxed bg-surface-tint p-space-md rounded-lg">
+              “Vidrio rajado en la pared norte de la caseta de arbitraje, cerca de la entrada principal de espectadores.”
+            </p>
+<!-- Metadatos de Auditoría y Trazabilidad -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pt-space-xs text-text-secondary font-label-sm text-label-sm">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="inline-flex items-center gap-1 font-mono-xs text-mono-xs text-sky-900 bg-surface-variant px-space-xs py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px]">person</span>
+                  vecino-auditor-01
+                </span>
+<span>•</span>
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">event</span>
+                  21 oct 2026, 15:00 (America/Lima)
+                </span>
+</div>
+<div class="inline-flex items-center gap-space-xs text-info font-medium bg-info-bg px-space-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">calendar_clock</span>
+<span>Inspección técnica preliminar programada</span>
+</div>
+</div>
+</article>
+<!-- TARJETA 2: REPORTE RESUELTO (RESOLUCIÓN HISTÓRICA) -->
+<article class="bg-surface rounded-xl p-space-xl shadow-sm hover:shadow-md transition-shadow flex flex-col gap-space-md">
+<!-- Header de Tarjeta -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm text-sky-700 font-semibold tracking-wide uppercase">
+                  Espacio Deportivo
+                </span>
+<h4 class="font-headline-sm text-headline-sm text-text-primary">
+                  Losas Comunitarias Barranco – Cancha Principal
+                </h4>
+</div>
+<!-- Insignia de estado: Resuelto -->
+<div class="flex items-center gap-space-sm self-start sm:self-auto">
+<span class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-success-bg text-success font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Resuelto</span>
+</span>
+</div>
+</div>
+<!-- Código de seguimiento -->
+<div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg w-fit">
+<span class="font-label-sm text-label-sm text-text-secondary">Código único:</span>
+<span class="font-mono-sm text-mono-sm text-sky-900 font-semibold select-all">
+                #c3b2a1d0…5c6d
+              </span>
+<button class="p-1 text-text-secondary hover:text-sky-700 rounded transition-colors" onclick="navigator.clipboard.writeText('c3b2a1d0-7e8f-4a9b-8c10-1e2f3a4b5c6d'); alert('Código copiado al portapapeles: c3b2a1d0-7e8f-4a9b-8c10-1e2f3a4b5c6d');" title="Copiar código completo" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<!-- Descripción de la Obra y Resolución -->
+<div class="flex flex-col gap-space-xs bg-success-bg p-space-md rounded-lg">
+<p class="font-body-lg text-body-lg text-text-primary leading-relaxed">
+                “Aro de básquet con soldadura rota en tablero este fue completamente sustituido por equipo antivandálico de alta resistencia.”
+              </p>
+<div class="flex items-center gap-space-xs text-success font-label-sm text-label-sm pt-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Dictamen técnico de conformidad emitido por la cuadrilla distrital.</span>
+</div>
+</div>
+<!-- Metadatos de Cierre -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pt-space-xs text-text-secondary font-label-sm text-label-sm">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="inline-flex items-center gap-1 font-mono-xs text-mono-xs text-sky-900 bg-surface-variant px-space-xs py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px]">person</span>
+                  user-vecino-4589
+                </span>
+<span>•</span>
+<span class="inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">event_available</span>
+                  Resuelto el 22 oct 2026, 11:20 (América/Lima)
+                </span>
+</div>
+<div class="inline-flex items-center gap-space-xs text-text-primary font-mono-xs text-mono-xs bg-surface-tint px-space-sm py-1 rounded">
+<span class="material-symbols-outlined text-[16px] text-sky-700">groups</span>
+<span>Cuadrilla de Mantenimiento Comunal Lima Sur</span>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- ESTADO VACÍO / SIMULACIÓN CÍVICA CUANDO NO HAY INCIDENTES -->
+<details class="group bg-surface rounded-xl overflow-hidden shadow-sm transition-all">
+<summary class="p-space-lg cursor-pointer flex items-center justify-between select-none hover:bg-sky-50 transition-colors">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-sky-700 text-[20px]">science</span>
+<span class="font-body-sm-medium text-body-sm-medium text-text-primary">
+              Simulación cívica: Vista cuando un espacio deportivo no registra desperfectos
+            </span>
+</div>
+<span class="material-symbols-outlined text-text-secondary group-open:rotate-180 transition-transform">
+            expand_more
+          </span>
+</summary>
+<div class="p-space-2xl flex flex-col items-center justify-center text-center gap-space-md bg-canvas">
+<!-- Ilustración Lineal Sobria Celeste -->
+<div class="w-20 h-20 rounded-full bg-surface-tint flex items-center justify-center text-sky-700 shadow-sm relative">
+<svg class="w-12 h-12 text-sky-600" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<circle cx="24" cy="24" r="20" stroke="currentColor" stroke-dasharray="3 3" stroke-width="2"></circle>
+<path d="M15 24.5L21 30.5L33 17.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<path d="M24 8V12M24 36V40M8 24H12M36 24H40" opacity="0.4" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-success text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+</span>
+</div>
+<div class="flex flex-col gap-1 max-w-md">
+<h5 class="font-headline-sm text-headline-sm text-sky-900">
+              Sin reportes pendientes en este espacio deportivo
+            </h5>
+<p class="font-body-sm text-body-sm text-text-secondary">
+              Esta infraestructura comunal se encuentra al 100% de operatividad según la última inspección vecinal y la certificación distrital.
+            </p>
+</div>
+<div class="flex items-center gap-space-sm pt-space-xs">
+<button class="h-10 px-space-lg rounded-lg bg-surface text-sky-700 font-label-md text-label-md font-semibold hover:bg-sky-50 shadow-sm transition-colors" type="button">
+              Ver incidentes de toda la comuna
+            </button>
+<button class="h-10 px-space-md rounded-lg text-text-secondary font-label-md text-label-md hover:text-sky-900 transition-colors" type="button">
+              Descargar informe de mantenimiento
+            </button>
+</div>
+</div>
+</details>
+</section>
+</div>
+<!-- MODAL DE CONFIRMACIÓN CÍVICA SIMULADO (INTERACCIÓN SIN RECARGA) -->
+<div aria-labelledby="modal-title" aria-modal="true" class="hidden fixed inset-0 z-50 flex items-center justify-center p-space-md bg-sky-900/40 backdrop-blur-sm" id="report-confirmation-modal" role="dialog">
+<div class="bg-surface rounded-xl p-space-2xl max-w-lg w-full shadow-2xl flex flex-col gap-space-lg">
+<div class="w-14 h-14 rounded-full bg-success-bg text-success flex items-center justify-center mx-auto shadow-sm">
+<span class="material-symbols-outlined text-[32px]">check_circle</span>
+</div>
+<div class="text-center flex flex-col gap-space-xs">
+<h3 class="font-headline-md text-headline-md text-sky-900" id="modal-title">
+          ¡Reporte Cívico Recibido!
+        </h3>
+<p class="font-body-sm text-body-sm text-text-secondary">
+          Tu alerta ha sido radicada formalmente ante la Subgerencia de Obras y Recreación de Lima Metropolitana.
+        </p>
+</div>
+<div class="bg-surface-tint p-space-md rounded-lg flex flex-col gap-space-xs">
+<div class="flex justify-between items-center text-text-secondary font-label-sm text-label-sm">
+<span>Identificador Vecinal</span>
+<span class="font-mono-xs text-mono-xs text-text-primary">vecino-auditor-01</span>
+</div>
+<div class="flex justify-between items-center text-text-secondary font-label-sm text-label-sm">
+<span>Código Público Generado</span>
+<span class="font-mono-xs text-mono-xs font-semibold text-sky-900">#e2a91f4b…89c1</span>
+</div>
+<div class="flex justify-between items-center text-text-secondary font-label-sm text-label-sm">
+<span>Plazo Legal de Evaluación</span>
+<span class="font-body-sm-medium text-body-sm-medium text-sky-700">48 horas hábiles</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-space-sm pt-space-xs">
+<button class="flex-1 h-11 px-space-md rounded-lg bg-sky-700 hover:bg-sky-800 text-on-primary font-label-md text-label-md font-semibold transition-colors" onclick="document.getElementById('report-confirmation-modal').classList.add('hidden');" type="button">
+          Entendido, ver seguimiento
+        </button>
+<button class="h-11 px-space-md rounded-lg bg-surface text-text-secondary hover:text-sky-900 font-label-md text-label-md transition-colors" onclick="document.getElementById('report-confirmation-modal').classList.add('hidden');" type="button">
+          Cerrar
+        </button>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface shadow-[0_1px_8px_rgba(12,31,46,0.04)] mt-auto"><div class="max-w-7xl mx-auto px-margin py-space-2xl"><div class="flex flex-col md:flex-row items-center justify-between gap-space-lg text-center md:text-left"><div class="flex flex-col gap-space-xs"><div class="flex items-center justify-center md:justify-start gap-space-sm"><span class="material-symbols-outlined text-sky-700 text-[22px]">account_balance</span><span class="font-headline-sm text-headline-sm text-sky-900">Municipalidad Metropolitana de Lima</span></div><p class="font-body-sm text-body-sm text-text-secondary">ComunaSport — Plataforma de Gestión Cívica Deportiva y Atención al Vecino</p><p class="font-mono-xs text-mono-xs text-text-disabled mt-space-xs">© 2025 Municipalidad Metropolitana de Lima. Todos los derechos reservados.</p></div><nav class="flex flex-wrap items-center justify-center gap-space-lg"><a class="font-body-sm text-body-sm text-text-secondary hover:text-sky-700 transition-colors" data-path="terminos-condiciones" href="#">Términos y Condiciones</a><a class="font-body-sm text-body-sm text-text-secondary hover:text-sky-700 transition-colors" data-path="privacidad" href="#">Política de Privacidad</a><a class="font-body-sm text-body-sm text-text-secondary hover:text-sky-700 transition-colors inline-flex items-center gap-space-xs" data-path="transparencia" href="#"><span class="material-symbols-outlined text-[16px]">open_in_new</span>Portal de Transparencia</a></nav></div></div></footer></body></html>

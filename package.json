@@ -22,19 +22,27 @@
     "start": "node dist/main.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "node db/migrate.js",
+    "db:seed": "node db/seed.js",
+    "db:sweep": "node db/sweep-idempotency.js"
   },
   "dependencies": {
-    "express": "^5.2.1",
-    "helmet": "^8.1.0",
     "cors": "^2.8.6",
+    "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "pg": "^8.23.1",
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.13.0",
+    "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "jest": "^30.4.2",
     "supertest": "^7.2.2",

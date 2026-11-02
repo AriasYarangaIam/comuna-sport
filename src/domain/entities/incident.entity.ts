@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 
+import { createIncidentStateBehavior } from "../services/incident-state-machine/incident-state-behavior.factory";
 import { IncidentStateBehavior } from "../services/incident-state-machine/incident-state-behavior.interface";
 import { UnderReviewState } from "../services/incident-state-machine/under-review.state";
 import { IncidentId } from "../value-objects/incident-id.vo";
@@ -41,6 +42,31 @@ export class Incident {
             params.description,
             createdAt,
             stateBehavior
+        );
+    }
+
+    static fromPersistence(params: {
+        id: IncidentId;
+        spaceId: SpaceId;
+        reporterId: string;
+        description: string;
+        createdAt: Date;
+        state: IncidentStateType;
+        resolvedAt: Date | null;
+    }): Incident {
+
+        if (params.reporterId.length < 1) throw new Error('The reporter id does not accept empty value');
+        if (params.description.length < 1 || params.description.length > 2000) throw new Error('The description must contain between 1 and 2000 characters');
+
+        const stateBehavior: IncidentStateBehavior = createIncidentStateBehavior(params.state);
+        return new Incident(
+            params.id,
+            params.spaceId,
+            params.reporterId,
+            params.description,
+            params.createdAt,
+            stateBehavior,
+            params.resolvedAt
         );
     }
 
