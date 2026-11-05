@@ -1,0 +1,20 @@
+# Render blueprint for the ComunaSport API.
+# The SPA is deployed separately on Vercel (apps/web/vercel.json); this file only
+# describes the backend and its database dependency.
+services:
+  - type: web
+    name: comuna-sport-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    # Migrations and the reference catalog run before the process starts, so a
+    # fresh managed database serves data on the first request.
+    startCommand: node db/migrate.js && node db/seed.js && node dist/main.js
+    healthCheckPath: /spaces
+    envVars:
+      - key: NODE_VERSION
+        value: 22.13.0
+      # Paste the managed PostgreSQL connection string (keep sslmode=require).
+      - key: DATABASE_URL
+        sync: false
