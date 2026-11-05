@@ -5,14 +5,17 @@ import { buildContainer, Container } from "./infrastructure/di/container";
 import { errorHandler } from "./infrastructure/http/middleware/error-handler.middleware";
 import { rateLimiter } from "./infrastructure/http/middleware/rate-limit.middleware";
 import { requestLogger } from "./infrastructure/http/middleware/request-logger.middleware";
-
-const PORT: number = 3000;
+import { resolvePort, TRUST_PROXY_HOPS } from "./infrastructure/config/runtime";
 
 // §11 middleware order (Decorator pattern):
 // helmet → cors → express.json → requestLogger → rateLimiter → routes → errorHandler LAST.
 // Exported so supertest e2e tests (T21) can build the app without listening.
 export const createApp = (container: Container): Express => {
     const app: Express = express();
+
+    // One trusted proxy hop: the hosting platform's edge. Without it every
+    // visitor behind the edge shares a single rate-limit bucket.
+    app.set('trust proxy', TRUST_PROXY_HOPS);
 
     app.use(helmet());
     app.use(cors());
@@ -37,8 +40,9 @@ const bootstrap = (): void => {
     }
     const container: Container = buildContainer();
     const app: Express = createApp(container);
-    app.listen(PORT, (): void => {
-        console.log(`comuna-sport-api listening on http://localhost:${PORT}`);
+    const port: number = resolvePort(process.env);
+    app.listen(port, (): void => {
+        console.log(`comuna-sport-api listening on http://localhost:${port}`);
     });
 };
 
