@@ -3,8 +3,14 @@ node_modules/
 dist/
 # Local Pi runtime state
 .atl/
+# Local verification artifacts (logs, probe payloads, browser snapshots)
+.tmp/
+.playwright-mcp/
 # Authoritative guides — deliberately untracked per maintainer directive (read-only aids)
 .codegraph/
 DEVELOPMENT.md
 DATABASE.md
 .env
+.vercel
+.env*
+!.env.example
