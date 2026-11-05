@@ -1,0 +1,4 @@
+# This host serves the ComunaSport API, not a website.
+# The public client lives on the Vercel project `web`.
+User-agent: *
+Disallow: /
