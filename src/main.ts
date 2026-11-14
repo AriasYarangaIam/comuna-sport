@@ -5,6 +5,7 @@ import { buildContainer, Container } from "./infrastructure/di/container";
 import { errorHandler } from "./infrastructure/http/middleware/error-handler.middleware";
 import { rateLimiter } from "./infrastructure/http/middleware/rate-limit.middleware";
 import { requestLogger } from "./infrastructure/http/middleware/request-logger.middleware";
+import { resolveCorsOptions } from "./infrastructure/config/cors";
 import { resolvePort, TRUST_PROXY_HOPS } from "./infrastructure/config/runtime";
 
 // §11 middleware order (Decorator pattern):
@@ -18,7 +19,9 @@ export const createApp = (container: Container): Express => {
     app.set('trust proxy', TRUST_PROXY_HOPS);
 
     app.use(helmet());
-    app.use(cors());
+    // S1: unset leaves the open demo default; a configured list becomes the
+    // whole allowlist and a malformed entry throws here, at boot.
+    app.use(cors(resolveCorsOptions(process.env)));
     app.use(json());
     app.use(requestLogger);
     app.use(rateLimiter);
