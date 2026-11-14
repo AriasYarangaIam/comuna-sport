@@ -20,6 +20,8 @@
     "dev": "ts-node src/main.ts",
     "build": "tsc",
     "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p tsconfig.api.json",
+    "typecheck:api": "tsc -p tsconfig.api.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
