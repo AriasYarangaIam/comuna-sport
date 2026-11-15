@@ -59,6 +59,23 @@ export class InMemoryIdempotencyStore implements IdempotencyStore {
         });
         return Promise.resolve();
     }
+
+    // Parity with the PostgreSQL `DELETE ... WHERE created_at < now() - interval
+    // '24 hours'`: the same TTL decides what is stale, and the count matches
+    // what a `DELETE` would report.
+    public sweepExpired(): Promise<number> {
+        const now: number = Date.now();
+        let removed: number = 0;
+
+        for (const [key, record] of store) {
+            if (now - record.createdAt >= IDEMPOTENCY_TTL_MS) {
+                store.delete(key);
+                removed += 1;
+            }
+        }
+
+        return Promise.resolve(removed);
+    }
 }
 
 export const inMemoryIdempotencyStore: InMemoryIdempotencyStore = new InMemoryIdempotencyStore();

@@ -15,4 +15,8 @@ export type IdempotencyClaimResult =
 export interface IdempotencyStore {
     claim(key: string, requestHash: string): Promise<IdempotencyClaimResult>;
     complete(key: string, status: number, body: unknown): Promise<void>;
+    // Reclaims records past the TTL and returns how many were removed. The TTL
+    // alone only makes a record ignorable; without a sweep the table grows
+    // forever, so a scheduler drives this daily (odd/tasks/deploy-hardening.md S3).
+    sweepExpired(): Promise<number>;
 }
