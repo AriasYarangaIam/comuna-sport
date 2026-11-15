@@ -39,7 +39,7 @@ import { InMemoryReservationRepository } from "../persistence/in-memory/reservat
 import { InMemorySpaceRepository } from "../persistence/in-memory/space.in-memory.repository";
 import { PostgresIdempotencyStore } from "../persistence/postgres/idempotency.postgres.store";
 import { PostgresIncidentRepository } from "../persistence/postgres/incident.postgres.repository";
-import { createPool } from "../persistence/postgres/pool";
+import { closePool, createPool } from "../persistence/postgres/pool";
 import { PostgresReservationRepository } from "../persistence/postgres/reservation.postgres.repository";
 import { PostgresSpaceRepository } from "../persistence/postgres/space.postgres.repository";
 
@@ -62,6 +62,18 @@ export class Container {
         const instance: unknown = factory();
         this.instances.set(token, instance);
         return instance as T; // §11 blueprint cast — storage-variance lookup, not a payload cast.
+    }
+
+    /**
+     * Releases process-lifetime resources (S4). Only an *instantiated* pool is
+     * closed: resolving the token here would create one just to end it.
+     */
+    public async close(): Promise<void> {
+        if (!this.instances.has('pool')) {
+            return;
+        }
+        const pool: Pool = this.instances.get('pool') as Pool;
+        await closePool(pool);
     }
 }
 

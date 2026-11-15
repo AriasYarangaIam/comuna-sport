@@ -1,4 +1,5 @@
 import express, { Express, json, Router } from "express";
+import type { Server } from "http";
 import cors from "cors";
 import helmet from "helmet";
 import { buildContainer, Container } from "./infrastructure/di/container";
@@ -6,6 +7,7 @@ import { errorHandler } from "./infrastructure/http/middleware/error-handler.mid
 import { rateLimiter } from "./infrastructure/http/middleware/rate-limit.middleware";
 import { requestLogger } from "./infrastructure/http/middleware/request-logger.middleware";
 import { resolveCorsOptions } from "./infrastructure/config/cors";
+import { createShutdownHandler } from "./infrastructure/config/shutdown";
 import { resolvePort, TRUST_PROXY_HOPS } from "./infrastructure/config/runtime";
 
 // §11 middleware order (Decorator pattern):
@@ -45,9 +47,30 @@ const bootstrap = (): void => {
     const container: Container = buildContainer();
     const app: Express = createApp(container);
     const port: number = resolvePort(process.env);
-    app.listen(port, (): void => {
+    const server: Server = app.listen(port, (): void => {
         console.log(`comuna-sport-api listening on http://localhost:${port}`);
     });
+
+    // S4: a deployed process is asked to stop with a signal. Stop accepting new
+    // connections first, then release the PostgreSQL pool (closePool used to be
+    // test-only, so connections were left to the platform to reap).
+    const shutdown = createShutdownHandler(
+        {
+            closeServer: (): Promise<void> => new Promise<void>((resolve: () => void): void => {
+                server.close((): void => resolve());
+            }),
+            closeResources: (): Promise<void> => container.close(),
+        },
+        (code: number): void => {
+            process.exit(code);
+        }
+    );
+
+    for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+        process.once(signal, (): void => {
+            void shutdown();
+        });
+    }
 };
 
 // §11 bootstrap runs ONLY when this module is the process entry point
