@@ -92,7 +92,7 @@ export function RoleSelector({
                 >
                   {option.adjustmentLabel ?? option.description}
                 </span>
-                <span className="mt-1 block text-caption text-ink-muted">
+                <span className="mt-1 block text-caption text-ink-soft">
                   Factor ×{option.factor.toFixed(1)}
                 </span>
               </span>

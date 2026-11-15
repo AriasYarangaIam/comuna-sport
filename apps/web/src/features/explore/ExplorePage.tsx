@@ -229,7 +229,7 @@ function StatCard({
       <dd className="mt-1 text-headline-sm font-semibold tabular-nums text-ink">
         {value}
       </dd>
-      <dd className="mt-0.5 text-caption text-ink-muted" data-reading-hide>
+      <dd className="mt-0.5 text-caption text-ink-soft" data-reading-hide>
         {hint}
       </dd>
     </div>

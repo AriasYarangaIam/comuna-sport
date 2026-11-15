@@ -29,7 +29,7 @@ export function Stepper({ steps, current, errorStep, className }: StepperProps) 
                     isCompleted && 'border-sky-700 bg-sky-700 text-white',
                     isCurrent && !hasError && 'border-sky-700 bg-sky-100 text-sky-800',
                     hasError && 'border-danger-text bg-danger-bg text-danger-text',
-                    !isCompleted && !isCurrent && !hasError && 'border-border bg-surface text-ink-muted',
+                    !isCompleted && !isCurrent && !hasError && 'border-border bg-surface text-ink-soft',
                   )}
                   aria-hidden="true"
                 >
