@@ -41,9 +41,9 @@ Notes learned from the actual deploys:
 - `outputDirectory: null` is ignored — Vercel demands an existing directory, hence `public/`.
 - A `Dockerfile` at the repository root makes Vercel detect a *container service* and reject the
   `functions` block. The image therefore lives at `deploy/Dockerfile`.
-- `api/index.ts` is bundled by Vercel's esbuild and is **not** covered by `tsc`
-  (`rootDir` is `src`). The live deployment is what proves it compiles and wires correctly; any
-  change to it needs a redeploy plus the `curl` check below.
+- `api/index.ts` is bundled by Vercel's esbuild, so `pnpm build` (`rootDir` is `src`) never sees it.
+  `pnpm typecheck:api` covers it through `tsconfig.api.json`; run it (or `pnpm typecheck`) before a
+  redeploy — the live deployment only proves it wires correctly, not that it type-checks.
 - Rate limiting is per serverless instance (in-memory store). Acceptable for this stage; a shared
   store would be needed for a strict global limit.
 
@@ -93,14 +93,45 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
 
 ## Deployed behaviour worth knowing
 
-- **CORS** is open (`cors()` defaults) because the SPA and the API are different origins. Restrict it
-  to the Vercel domain when the project leaves the demo stage.
+- **CORS** is open (`cors()` defaults) while this stays a demo. Set `CORS_ALLOWED_ORIGINS` on the
+  deployment to make the SPA's origin the whole allowlist:
+
+  ```bash
+  pnpm dlx vercel@latest env add CORS_ALLOWED_ORIGINS production
+  # value: https://web-rust-iota-ncqbfyebew.vercel.app
+  pnpm dlx vercel@latest --prod --yes
+  ```
+
+  The value is a comma-separated list of absolute origins (`scheme://host[:port]`, no path, no
+  trailing slash). A malformed entry throws at boot instead of silently falling back to open CORS.
+  Unset or blank keeps today's open behaviour.
 - **`trust proxy` is one hop** (`TRUST_PROXY_HOPS` in `src/infrastructure/config/runtime.ts`), so the
   forwarded client address is the rate-limit key instead of the platform edge.
 - **Availability is informative.** `GET /spaces/availability` answers which spaces have the slot
   inside their availability window; overlap is validated when the reservation is created, so a slot
   can be listed and still answer `409 RESERVATION_CONFLICT`, and the SPA offers alternatives.
-- **Idempotency is durable** in PostgreSQL with a 24 h TTL; `pnpm db:sweep` clears expired rows.
+- **Idempotency is durable** in PostgreSQL with a 24 h TTL. `pnpm db:sweep` clears expired rows by
+  hand and `GET /internal/idempotency/sweep` does the same over HTTP, so a scheduler can drive it:
+
+  | | |
+  | :--- | :--- |
+  | Route | `GET /internal/idempotency/sweep` → `200 {"swept": <n>}` |
+  | Auth | `Authorization: Bearer $CRON_SECRET` (constant-time compare) |
+  | Scheduled by | `crons` in `vercel.json` — daily at `0 3 * * *` UTC (Hobby allows once a day) |
+  | Unset `CRON_SECRET` | the route answers `404 SWEEP_DISABLED` and nothing is exposed |
+  | Wrong token | `401 UNAUTHORIZED` |
+
+  Vercel sends the `Authorization` header automatically when `CRON_SECRET` exists on the project:
+
+  ```bash
+  pnpm dlx vercel@latest env add CRON_SECRET production   # any random string (≥16 chars)
+  pnpm dlx vercel@latest --prod --yes
+  ```
+
+  Any other scheduler works too: it only has to send that header to the same path.
+- **Shutdown is graceful.** `SIGTERM`/`SIGINT` stop the listener first and then release the
+  PostgreSQL pool (`Container.close()`); a repeated signal joins the first run instead of closing
+  twice. Before this, the pool was only closed by tests.
 - **Neon free tier** suspends the compute when idle: the first request after a quiet period pays a
   cold start (observed ~1.7 s).
 
