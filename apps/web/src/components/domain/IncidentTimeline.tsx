@@ -114,12 +114,12 @@ export function IncidentTimeline({
                   <p className="mt-0.5 text-small text-ink-soft">{node.hint}</p>
                 ) : null}
                 {isCurrent && createdAt !== undefined && index === 0 ? (
-                  <p className="mt-0.5 text-caption text-ink-muted">
+                  <p className="mt-0.5 text-caption text-ink-soft">
                     Reportado el {createdAt}
                   </p>
                 ) : null}
                 {node.state === 'RESOLVED' && resolvedAt !== undefined && resolvedAt !== null ? (
-                  <p className="mt-0.5 text-caption text-ink-muted">
+                  <p className="mt-0.5 text-caption text-ink-soft">
                     Resuelto el {resolvedAt}
                   </p>
                 ) : null}

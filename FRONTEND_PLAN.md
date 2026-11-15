@@ -303,12 +303,56 @@ const api = {
 
 ## 10. Criterios de aceptación del plan
 
-- [ ] El scaffold compila con `pnpm dev` sin errores.
-- [ ] Tailwind aplica todos los tokens de §4.
-- [ ] No hay CDNs en `index.html` de producción.
-- [ ] Estructura de carpetas respeta §3.
-- [ ] `AppShell` renderiza navegación inferior en 360 px y superior en 1024 px.
-- [ ] Lighthouse ≥ 90 en Performance, Accessibility y Best Practices en la página de inicio vacía.
+- [x] El scaffold compila con `pnpm dev` sin errores. — `pnpm typecheck` (tsc -b) sin
+  errores y la suite E2E arranca `pnpm dev` como webServer: 10/10 pruebas en verde.
+- [x] Tailwind aplica todos los tokens de §4. — `tailwind.config.ts` reproduce la tabla de
+  §4 literalmente y las variables de motion de §4 están en `src/styles/index.css`; verificado
+  sobre el build de producción (fondo `#F4FAFF`, Inter, `borderRadius.card` 12 px, `boxShadow.card`).
+- [x] No hay CDNs en `index.html` de producción. — `index.html` no referencia ningún origen
+  externo (0 coincidencias de `http://`/`https://`) y las fuentes son self-host vía `@fontsource`:
+  en runtime solo hay peticiones al mismo origen más la API.
+- [x] Estructura de carpetas respeta §3. — Única desviación: `main.tsx` vive en `src/` (convención
+  de Vite, referenciado así por `index.html`) en lugar de `src/app/`.
+- [x] `AppShell` renderiza navegación inferior en 360 px y superior en 1024 px. — Verificado en
+  navegador real: a 360 px la barra inferior es visible, la superior está oculta y no hay
+  desborde horizontal; a 1024 px la superior es visible y la inferior queda en `display: none`.
+- [x] Lighthouse ≥ 90 en Performance, Accessibility y Best Practices en la página de inicio vacía.
+
+### 10.1 Evidencia de QA (fase 7)
+
+Medido el 2026-11-14 sobre el build de producción (`vite build` + `vite preview`) apuntando a la
+API desplegada, con Lighthouse 12.8.2 sobre Chrome real:
+
+| Categoría | Móvil (emulación por defecto) | Escritorio (`--preset=desktop`) |
+| :--- | :---: | :---: |
+| Performance | 94 | 100 |
+| Accessibility | 100 | 100 |
+| Best Practices | 100 | 100 |
+
+Métricas móviles: FCP 2.4 s, LCP 2.6 s, TBT 10 ms, CLS 0, peso total 229 KiB.
+
+El primer barrido dio Accessibility 96 por un único hallazgo de `color-contrast`: las pistas de
+los `StatCard` de S1 usaban `text-ink-muted` (`#8FA6B8`, 2.52:1), que `DESIGN.md` §3.1 reserva
+para componentes deshabilitados. Se movieron a `text-ink-soft` (`#56718A`, 4.8:1) los textos
+informativos que usaban ese token (`StatCard`, `IncidentTimeline`, `RoleSelector`, `Stepper`) y
+se agregó `apps/web/e2e/a11y.spec.ts`, que corre axe con la regla `color-contrast` habilitada en
+un navegador real (jsdom no puede evaluarla).
+
+### 10.2 Auditoría de bundle
+
+`vite build --sourcemap` + `source-map-explorer`. Chunk inicial: **420.7 kB (129.0 kB gzip)**.
+
+| Origen | Tamaño | % del chunk |
+| :--- | ---: | ---: |
+| `react-dom` | 205 kB | 49.9 % |
+| `react-router` | 90 kB | 22.0 % |
+| `zod` | 52 kB | 12.7 % |
+| `@tanstack/query-core` | 26 kB | 6.4 % |
+| Código propio | 18 kB | 4.3 % |
+| `react`, `lucide-react`, `scheduler`, `zustand` | 20 kB | 4.7 % |
+
+Las rutas ya están code-spliteadas (ningún chunk de pantalla supera 25 kB). El costo restante es
+el piso del stack (React 19 + router + validación). No requiere acción para v1.
 
 ---
 
@@ -322,7 +366,10 @@ const api = {
 
 ## 12. Próximos pasos inmediatos
 
-1. Ejecutar `pnpm install` en `apps/web`.
-2. Verificar que `pnpm dev` levante la SPA en `http://localhost:5173`.
-3. Configurar proxy `/api` hacia `http://localhost:3000` en `vite.config.ts`.
-4. Comenzar Fase 1: codificar tokens y componentes base.
+Las fases 0–7 están cerradas. Lo que queda fuera de este plan está listado en `DEPLOYMENT.md`
+(«Deployed behaviour worth knowing») y se resume en:
+
+1. Restringir CORS al dominio de la SPA cuando el proyecto deje de ser una demo.
+2. Cubrir `api/index.ts` con `tsc` (Vercel lo empaqueta con esbuild y hoy queda fuera del typecheck).
+3. Programar `pnpm db:sweep` (cron) para liberar las claves de idempotencia vencidas.
+4. Re-ejecutar `node db/seed.js` antes de una demostración posterior al 2026-12-03.
