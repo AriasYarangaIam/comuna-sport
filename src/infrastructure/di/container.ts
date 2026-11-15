@@ -28,6 +28,7 @@ import { ReservationController } from "../http/controllers/reservation.controlle
 import { SpaceController } from "../http/controllers/space.controller";
 import { createIdempotencyGuard } from "../http/middleware/idempotency.middleware";
 import { createIncidentRoutes } from "../http/routes/incident.routes";
+import { createInternalRoutes } from "../http/routes/internal.routes";
 import { createReservationRoutes } from "../http/routes/reservation.routes";
 import { createSpaceRoutes } from "../http/routes/space.routes";
 import { NotificationListener } from "../event-bus/listeners/notification.listener";
@@ -89,7 +90,8 @@ export type ContainerTokens =
     | 'spaceController'
     | 'reservationRoutes'
     | 'incidentRoutes'
-    | 'spaceRoutes';
+    | 'spaceRoutes'
+    | 'internalRoutes';
 
 // Composition root — the ONLY place concretes appear (Singleton row, D2/D3 wiring).
 // With a database URL the D3 ports bind to the PostgreSQL adapter; otherwise the
@@ -210,6 +212,12 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
 
     container.register('spaceRoutes', (): Router =>
         createSpaceRoutes(container.resolve<SpaceController>('spaceController')));
+
+    // S3: the scheduled sweep talks to the same IdempotencyStore port as the
+    // request guard, so the in-memory and PostgreSQL adapters stay the only
+    // place the TTL predicate is implemented.
+    container.register('internalRoutes', (): Router =>
+        createInternalRoutes(container.resolve<IdempotencyStore>('idempotencyStore')));
 
     // §11 step 4: subscribe the notification listener to the event bus — the
     // listener is typed against the concrete event, so the literal below is

@@ -25,6 +25,7 @@ export const createApp = (container: Container): Express => {
     app.use(json());
     app.use(requestLogger);
     app.use(rateLimiter);
+    app.use(container.resolve<Router>('internalRoutes'));
     app.use(container.resolve<Router>('spaceRoutes'));
     app.use(container.resolve<Router>('reservationRoutes'));
     app.use(container.resolve<Router>('incidentRoutes'));

@@ -345,5 +345,34 @@ describeWithDatabase('Postgres adapters (D3)', (): void => {
             expect(replay.status).toBe(201);
             expect(replay.body).toEqual(body);
         });
+
+        // S3 (odd/tasks/deploy-hardening.md): the cron endpoint deletes through
+        // this method. It must remove only rows past the 24 h TTL, so it is
+        // driven here with one back-dated row and one fresh row.
+        it('sweeps only the keys past the 24 h TTL', async (): Promise<void> => {
+            const staleKey: string = `key-stale-${randomUUID()}`;
+            const freshKey: string = `key-fresh-${randomUUID()}`;
+            const hash: string = sha256('payload-sweep');
+
+            await idempotencyStore.claim(staleKey, hash);
+            await idempotencyStore.claim(freshKey, hash);
+            await pool.query(
+                "UPDATE idempotency_keys SET created_at = now() - interval '25 hours' WHERE key = $1",
+                [staleKey]
+            );
+
+            const swept: number = await idempotencyStore.sweepExpired();
+
+            expect(swept).toBe(1);
+            const remaining = await pool.query<{ readonly key: string }>(
+                'SELECT key FROM idempotency_keys WHERE key = ANY($1::text[])',
+                [[staleKey, freshKey]]
+            );
+            expect(remaining.rows.map((row) => row.key)).toEqual([freshKey]);
+
+            // A swept key is claimable again; a live one still reports in_flight.
+            expect((await idempotencyStore.claim(staleKey, hash)).outcome).toBe('claimed');
+            expect((await idempotencyStore.claim(freshKey, hash)).outcome).toBe('in_flight');
+        });
     });
 });

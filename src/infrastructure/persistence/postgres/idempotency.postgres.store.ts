@@ -30,6 +30,12 @@ const SELECT_CLAIM_SQL: string =
 const DELETE_STALE_SQL: string =
     "DELETE FROM idempotency_keys WHERE key = $1 AND created_at < now() - interval '24 hours'";
 
+// Daily sweep driven by the cron endpoint (odd/tasks/deploy-hardening.md S3).
+// The predicate is the same one `claim` uses to call a row stale, and it matches
+// `db/sweep-idempotency.js`, so the manual and scheduled runs cannot diverge.
+const SWEEP_EXPIRED_SQL: string =
+    "DELETE FROM idempotency_keys WHERE created_at < now() - interval '24 hours'";
+
 export class PostgresIdempotencyStore implements IdempotencyStore {
     public constructor(private readonly pool: Pool) {}
 
@@ -77,5 +83,10 @@ export class PostgresIdempotencyStore implements IdempotencyStore {
             'WHERE key = $1',
             [key, status, JSON.stringify(body)]
         );
+    }
+
+    public async sweepExpired(): Promise<number> {
+        const deleted: QueryResult<never> = await this.pool.query<never>(SWEEP_EXPIRED_SQL);
+        return deleted.rowCount ?? 0;
     }
 }
