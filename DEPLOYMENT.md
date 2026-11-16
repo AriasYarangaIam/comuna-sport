@@ -93,8 +93,14 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
 
 ## Deployed behaviour worth knowing
 
-- **CORS** is open (`cors()` defaults) while this stays a demo. Set `CORS_ALLOWED_ORIGINS` on the
-  deployment to make the SPA's origin the whole allowlist:
+- **CORS is restricted in production.** `CORS_ALLOWED_ORIGINS` is set on the `comuna-sport-api`
+  project to the SPA's production origin, so that origin — and only it — receives
+  `Access-Control-Allow-Origin`; any other origin gets the response without the header. A fresh clone
+  or a deployment without the variable keeps the open demo default (`cors()` defaults, `*`).
+
+  ```bash
+  pnpm dlx vercel@latest env ls   # CORS_ALLOWED_ORIGINS, CRON_SECRET (Production)
+  ```
 
   ```bash
   pnpm dlx vercel@latest env add CORS_ALLOWED_ORIGINS production
@@ -104,7 +110,10 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
 
   The value is a comma-separated list of absolute origins (`scheme://host[:port]`, no path, no
   trailing slash). A malformed entry throws at boot instead of silently falling back to open CORS.
-  Unset or blank keeps today's open behaviour.
+
+  **Preview deployments:** because the allowlist is exact, a SPA preview (`web-git-<branch>-*.vercel.app`,
+  `web-<hash>-*.vercel.app`) is blocked by CORS when it calls the production API. Add that origin to
+  the variable, or point the preview at its own API, before demoing from a preview URL.
 - **`trust proxy` is one hop** (`TRUST_PROXY_HOPS` in `src/infrastructure/config/runtime.ts`), so the
   forwarded client address is the rate-limit key instead of the platform edge.
 - **Availability is informative.** `GET /spaces/availability` answers which spaces have the slot
@@ -128,7 +137,10 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
   pnpm dlx vercel@latest --prod --yes
   ```
 
-  Any other scheduler works too: it only has to send that header to the same path.
+  Any other scheduler works too: it only has to send that header to the same path. Confirmed on the
+  live project: `vercel crons ls` lists `0 3 * * *`, a call without the token answers `401`, and the
+  first authenticated call answered `{"swept": 9}` — the keys that accumulated while the sweep only
+  existed as a manual script.
 - **Shutdown is graceful.** `SIGTERM`/`SIGINT` stop the listener first and then release the
   PostgreSQL pool (`Container.close()`); a repeated signal joins the first run instead of closing
   twice. Before this, the pool was only closed by tests.
