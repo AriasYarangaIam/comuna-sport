@@ -51,7 +51,7 @@ infraestructura, con dos promesas medibles: **cero favoritismo** (toda tarifa es
 **auditoría ciudadana** (todo daño reportado es rastreable en su ciclo de vida).
 
 Alcance de esta entrega de diseño: cliente web responsive (mobile-first) sobre la API existente. Sin
-autenticación real (los identificadores se ingresan manualmente), sin pagos en línea, sin panel administrativo.
+autenticación real (el DNI se ingresa manualmente), sin pagos en línea, sin panel administrativo.
 
 ### Principios de diseño
 
@@ -74,7 +74,7 @@ rol: adapta énfasis, no permisos.
 | :--- | :--- | :--- | :--- |
 | `NEIGHBOR` | Vecino que juega al salir del trabajo | Reservar en < 60 s desde el móvil | Flujo de 3 pasos, CTA fija, hora sugerida "ahora + 1 h" |
 | `YOUTH` | Estudiante | Misma tarifa que vecino, reserva rápida en grupo | Igual que `NEIGHBOR` + campo de aforo informativo del espacio |
-| `SENIOR` | Adulto mayor (50 % de descuento) | Leer sin esfuerzo y entender su beneficio | Insignia "Beneficio Adulto Mayor −50 %", ahorro en `PEN` visible, **Modo Lectura Fácil** (§9.4) |
+| `SENIOR` | Adulto mayor (50 % de descuento) | Leer sin esfuerzo y entender su beneficio | Insignia "Beneficio Adulto Mayor −50 %", ahorro en `PEN` visible |
 | `PRIVATE_CLUB` | Academia o club | Comprobante formal con recargo explicado | Desglose "Recargo solidario +20 % → mantenimiento comunitario" |
 | Auditor vecino | Quien reporta daños | Reportar en < 1 min y ver seguimiento | Formulario de 3 campos con contador 0/2000 y tablero de estados |
 
@@ -321,8 +321,8 @@ botón "Ver todos"; error `500` = `InlineAlert` danger "No pudimos cargar los es
 
 ### S3 · Asistente de reserva (3 pasos, hoja en móvil)
 
-**Objetivo:** completar `POST /spaces/:id/reservations` explicando el precio antes de confirmar.
-**Datos de entrada:** `userId` (texto libre, mín. 1), `role` (enum), `timeSlot.start/end` (ISO-8601),
+**Objetivo:** completar `POST /spaces/:slug/reservations` explicando el precio antes de confirmar.
+**Datos de entrada:** `dni` (8 dígitos, `^\d{8}$`), `role` (enum), `timeSlot.start/end` (ISO-8601),
 cabecera `Idempotency-Key` (obligatoria).
 
 ```text
@@ -332,10 +332,10 @@ Móvil — hoja a pantalla completa                          Desktop — diálog
 │ ● ● ○   1 Identificación           │                    │ ● ● ○                   │
 ├────────────────────────────────────┤                    ├──────────────────────────┤
 │ Identifícate para tu reserva       │                    │ (mismo contenido, 2 col) │
-│ ID de usuario o DNI                │                    │                          │
-│ [ user-vecino-4589          ]      │                    │                          │
-│ ⓘ No es una cuenta: identifica tu  │                   │                          │
-│   reserva en el comprobante.       │                    │                          │
+│ DNI                                │                    │                          │
+│ [ 12345678                  ]      │                    │                          │
+│ ⓘ Ocho dígitos, sin puntos ni      │                    │                          │
+│   espacios.                        │                    │                          │
 │                                    │                    ├──────────────────────────┤
 │ ┌────────────────────────────────┐ │                    │ Resumen de tarifa        │
 │ │ Precio base       S/ 100.00    │ │                    │ Base           S/ 100.00 │
@@ -369,7 +369,6 @@ Móvil — hoja a pantalla completa                          Desktop — diálog
 │ │ ──────────────────────────────────────────────────────── │ │
 │ │ TOTAL A PAGAR                              S/  50.00 PEN │ │
 │ └──────────────────────────────────────────────────────────┘ │
-│ 🔒 Referencia de operación: 9b1deb4d…cb6d  (mono, 12 px)     │
 │                                                              │
 │ [Atrás]                          [Confirmar reserva]         │
 └──────────────────────────────────────────────────────────────┘
@@ -383,9 +382,9 @@ Reglas de UX conectadas al dominio:
 2. **Validación preventiva de franja:** `fin > inicio` y ambos en el mismo día calendario **de America/Lima**
    (`time-slot.vo.ts:19-20`); la UI además restringe las opciones de hora a la `availabilityWindows` del espacio
    (`space.entity.ts:80-84`) para no ofrecer lo que el servidor rechazará.
-3. **Idempotencia visible:** la "referencia de operación" es la `Idempotency-Key` vigente. Se rota **solo** al
-   abrir el asistente o al cambiar `userId`, `role` o `timeSlot`; un reintento o doble toque reutiliza la misma
-   llave (§6.2).
+3. **Idempotencia invisible:** la `Idempotency-Key` viaja solo en la cabecera de la petición; la UI no muestra
+   la llave ni explica el mecanismo. Se rota **solo** al abrir el asistente o al cambiar `dni`, `role` o
+   `timeSlot`; un reintento o doble toque reutiliza la misma llave (§6.2).
 4. **Un solo CTA sólido por paso**; "Atrás" siempre secundario y nunca descarta datos ya ingresados.
 5. Al confirmar: botón pasa a estado "Procesando…" con spinner y `aria-busy`, y se bloquea el doble envío en el
    cliente (el servidor también lo bloquea).
@@ -422,20 +421,21 @@ nuevamente" + rotación silenciosa de la llave.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-- El nombre del espacio **no viene** en el DTO: se resuelve con el catálogo ya cargado o `GET /spaces/:id`.
+- El nombre del espacio **no viene** en el DTO: se resuelve con el catálogo ya cargado o `GET /spaces/:slug`.
 - El aviso de notificación es informativo (el `NotificationListener` corre del lado servidor); no debe prometer
   canales configurables por el usuario.
 - Botón "Copiar" con confirmación efímera "Copiado" (1.5 s) y `role="status"`.
 
 ### S5 · Mis reservas
 
-**Objetivo:** listar y verificar reservas por identificador de usuario.
-**Datos:** `GET /users/:userId/reservations` → `ReservationResponseDto[]`; detalle `GET /reservations/:id`.
+**Objetivo:** listar y verificar reservas por DNI.
+**Datos:** `GET /users/:dni/reservations` → `ReservationResponseDto[]` (el parámetro se valida como
+`^\d{8}$`); detalle `GET /reservations/:id`.
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ Mis reservas                                                                 │
-│ ID de usuario  [ user-vecino-4589            ]  [Buscar]                     │
+│ DNI           [ 12345678                 ]  [Buscar]                     │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ ┌──────────────────────────────────────────────────────────────────────────┐ │
 │ │ 🏟 Cancha de Veteranos Miraflores                ● Activa                │ │
@@ -448,7 +448,7 @@ nuevamente" + rotación silenciosa de la llave.
 
 - No hay endpoint de cancelación: **no** se muestra acción "Cancelar" (§6.3).
 - Orden por `createdAt` descendente, calculado en cliente.
-- Estado vacío: "Aún no tienes reservas con este identificador" + CTA "Explorar espacios".
+- Estado vacío: "Aún no tienes reservas con este DNI" + CTA "Explorar espacios".
 
 ### S6 · Incidentes: reportar y seguir
 
@@ -460,7 +460,7 @@ nuevamente" + rotación silenciosa de la llave.
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ REPORTAR UN DAÑO                                                             │
 │ Espacio afectado  [ Cancha de Veteranos Miraflores      ▾ ]                  │
-│ Tu identificador  [ vecino-auditor-01                   ]                    │
+│ Tu DNI          [ 12345678                           ]                    │
 │ ¿Qué pasó?        ┌──────────────────────────────────────────────────────┐   │
 │                   │ Tablero de básquet con fisura en el soporte norte…   │   │
 │                   └──────────────────────────────────────────────────────┘   │
@@ -479,11 +479,11 @@ nuevamente" + rotación silenciosa de la llave.
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- Formulario de 3 campos: `spaceId` (select alimentado por `GET /spaces`), `reporterId` (libre, mín. 1),
+- Formulario de 3 campos: `spaceSlug` (select alimentado por `GET /spaces`), `dni` (8 dígitos, `^\d{8}$`),
   `description` (mín. 1, máx. 2000 → contador `n / 2000`, `maxlength=2000`, recorte de espacios al enviar).
 - El riel de estados es **solo lectura** e informativo: la API no expone transiciones (§6.3). El nodo actual se
   marca con `aria-current="step"`; los futuros se atenúan; `REJECTED` es terminal y se rotula como tal.
-- Listado: `GET /spaces/:id/incidents` cuando hay espacio seleccionado; detalle con `GET /incidents/:id`.
+- Listado: `GET /spaces/:slug/incidents` cuando hay espacio seleccionado; detalle con `GET /incidents/:id`.
 - Tras `201`: la tarjeta del nuevo reporte entra arriba con animación de 240 ms y foco en su encabezado.
 
 **Estados:** `404 SPACE_NOT_FOUND` (espacio eliminado del catálogo) → alerta "El espacio ya no existe"; `400`
@@ -506,14 +506,18 @@ pantalla. No forma parte de los prompts de Stitch (no aporta al diseño visual e
 | Método y ruta | Respuesta | Uso en UI |
 | :--- | :--- | :--- |
 | `GET /spaces` | `SpaceResponseDto[]` | S1, selects de S3/S6 |
-| `GET /spaces/:id` | `SpaceResponseDto` | Detalle, resolver nombre en S4 |
+| `GET /spaces/:slug` | `SpaceResponseDto` | Detalle, resolver nombre en S4 |
 | `GET /spaces/availability?start&end` | `SpaceResponseDto[]` libres | S2 (franjas) |
-| `POST /spaces/:id/reservations` + `Idempotency-Key` | `201 ReservationResponseDto` | S3, S4 |
+| `POST /spaces/:slug/reservations` + `Idempotency-Key` | `201 ReservationResponseDto` | S3, S4 |
 | `GET /reservations/:id` | `ReservationResponseDto` | Detalle de S5 |
-| `GET /users/:userId/reservations` | `ReservationResponseDto[]` | S5 |
+| `GET /users/:dni/reservations` | `ReservationResponseDto[]` | S5 |
 | `POST /incidents` | `201 IncidentResponseDto` | S6 (reporte) |
 | `GET /incidents/:id` | `IncidentResponseDto` | Detalle de S6 |
-| `GET /spaces/:id/incidents` | `IncidentResponseDto[]` | Listado de S6 |
+| `GET /spaces/:slug/incidents` | `IncidentResponseDto[]` | Listado de S6 |
+
+Identificadores públicos (contrato de privacidad): los espacios se direccionan por `slug` — nunca por UUID —
+y el único identificador ciudadano es el `dni` (8 dígitos, `^\d{8}$`), validado como entrada y **nunca**
+devuelto en ninguna respuesta.
 
 Campos que la UI **debe** respetar tal cual: `basePrice.amount` es numérico (no formateado), `basePrice.currency`
 es `'PEN'`, `cost.amount` ya viene redondeado por el servidor, `availabilityWindows[].start/end` son ISO-8601 UTC,
@@ -522,11 +526,10 @@ es `'PEN'`, `cost.amount` ya viene redondeado por el servidor, `availabilityWind
 
 ### 6.2 Ciclo de la `Idempotency-Key`
 
-1. Se genera `crypto.randomUUID()` al abrir el asistente y cada vez que cambian `userId`, `role` o `timeSlot`.
+1. Se genera `crypto.randomUUID()` al abrir el asistente y cada vez que cambian `dni`, `role` o `timeSlot`.
 2. "Confirmar", reintento por red y doble toque envían **la misma** llave.
 3. Se rota después de `201` o tras `422 payload_mismatch`. Nunca antes.
-4. La llave se muestra truncada, en mono, como "referencia de operación"; es evidencia de transparencia, no un
-   dato para memorizar.
+4. La llave **no se muestra** en la UI: viaja solo en la cabecera de la petición.
 
 Contrato del servidor que la UI debe reflejar sin reinterpretarlo (`idempotency.middleware.ts:45,63,73`):
 
@@ -574,7 +577,7 @@ Formato uniforme del backend: `{ "error": { "code", "message", "details? } }`
 | 400 | `BAD_REQUEST` (`slot end must be after start`) | Error inline en hora fin | "La hora de fin debe ser posterior a la de inicio." |
 | 400 | `BAD_REQUEST` (`slot must be within the same calendar`) | Error inline bajo la fecha | "El inicio y el fin deben ser el mismo día." |
 | 400 | `BAD_REQUEST` (franja fuera de ventana) | `InlineAlert` warning | "Ese horario está fuera del horario de atención de este espacio." |
-| 400 | `BAD_REQUEST` (validación Zod de campos) | Error inline por campo | Según campo: "Ingresa tu identificador", "Describe el daño (máximo 2000 caracteres)". |
+| 400 | `BAD_REQUEST` (validación Zod de campos) | Error inline por campo | Según campo: "Ingresa tu DNI", "Describe el daño (máximo 2000 caracteres)". |
 | 400 | `BAD_REQUEST` (`cannot file incident on inactive space`) | `InlineAlert` warning | "Este espacio está fuera de servicio: no admite reportes en este momento." |
 | 404 | `SPACE_NOT_FOUND` (también al reservar en un espacio **inactivo**) | `EmptyState` + redirección | "Ese espacio ya no está disponible. Vuelve al explorador." |
 | 404 | `INCIDENT_NOT_FOUND` / `RESERVATION_NOT_FOUND` | `EmptyState` | "No encontramos ese registro. Puede haber expirado." |
@@ -593,7 +596,7 @@ Un espacio inactivo se manifiesta de dos formas distintas y la UI debe resolverl
 
 | Intento | Respuesta real | Cómo decide la UI |
 | :--- | :--- | :--- |
-| Reservar en espacio inactivo | `404 SPACE_NOT_FOUND`, `message: "space is inactive: <id>"` | Si el `spaceId` existe en el catálogo con `isActive: false` → "Espacio en mantenimiento"; si no existe → "ya no está disponible" |
+| Reservar en espacio inactivo | `404 SPACE_NOT_FOUND`, `message: "space is inactive: <slug>"` | Si el `spaceSlug` existe en el catálogo con `isActive: false` → "Espacio en mantenimiento"; si no existe → "ya no está disponible" |
 | Reportar daño en espacio inactivo | `400 BAD_REQUEST`, `message: "cannot file incident on inactive space"` | Igual: decidir por `isActive` del catálogo, no por el texto |
 
 ---
@@ -658,11 +661,11 @@ Un espacio inactivo se manifiesta de dos formas distintas y la UI debe resolverl
 5. A 200 % de zoom: sin scroll horizontal y sin texto cortado en S1, S3, S6.
 6. Doble toque en "Confirmar" produce **una** reserva (verificable por el mismo `id`).
 
-### 9.4 Modo Lectura Fácil (opcional, recomendado)
+### 9.4 Modo Lectura Fácil (retirado)
 
-Interruptor "Lectura fácil" en la barra (icono `Aa`), persistido en `localStorage`, aplicado como
-`<html data-reading="large">`: base 18 px / 28, cuerpo en peso 500, objetivos táctiles 56 px, ocultamiento de
-metadatos no esenciales (UUID en mono, contadores). No restringe funciones. Estado por defecto: apagado.
+El interruptor "Lectura fácil", su estado en `localStorage` y sus reglas CSS se **retiraron** de la SPA
+(decisión del usuario, 2026-11-17 — `odd/tasks/privacy-identifiers-and-copy.md` S6): no aportaba más que
+cambiar el texto visible. El copy conserva el registro formal (usted) sin exponer mecanismos del sistema (S7).
 
 ---
 
@@ -799,8 +802,8 @@ Cabecera de la hoja: botón ✕ a la izquierda, título "Reservar · Cancha de V
 indicador de 3 pasos con círculos y líneas (paso actual #15699E relleno, completado con check, futuro #C9E6FE).
 Al pie siempre un botón primario fijo de ancho completo y 48px: "Continuar" o "Confirmar reserva".
 
-Paso 1 "Identificación": etiqueta "Identifícate para tu reserva", input con placeholder "ID de usuario o DNI",
-texto de ayuda "No es una cuenta: identifica tu reserva en el comprobante.", y una caja de resumen con fondo
+Paso 1 "Identificación": etiqueta "Identifícate para tu reserva", input etiquetado "DNI" con placeholder
+"12345678", texto de ayuda "Ocho dígitos, sin puntos ni espacios.", y una caja de resumen con fondo
 #F4FAFF y borde #C9E6FE: "Precio base S/ 100.00" y "Total estimado S/ 100.00".
 
 Paso 2 "Categoría comunitaria": título "Selecciona tu categoría comunitaria" y subtítulo "El precio se calcula
@@ -814,7 +817,6 @@ Paso 3 "Franja horaria": campo "Fecha" con "24 oct 2026", dos selects "Inicio 10
 "Ventana del espacio: hoy 08:00–22:00 · misma fecha". Debajo, tarjeta "Resumen de tarifa" con filas alineadas a la
 derecha con números tabulares: "Precio base del espacio S/ 100.00 PEN", "Beneficio Adulto Mayor (−50 %)
 −S/ 50.00 PEN" (en #0E7C63), línea separadora, y "TOTAL A PAGAR S/ 50.00 PEN" en 22px semibold.
-Al final, una línea pequeña en monoespaciada: "Referencia de operación: 9b1deb4d…cb6d".
 El botón inferior dice "Confirmar reserva". A la izquierda del botón, un enlace secundario "Atrás".
 ```
 
@@ -840,8 +842,8 @@ Genera una pantalla de confirmación para móvil 360px y otra versión escritori
 Genera una pantalla web de escritorio 1280px "Incidentes comunitarios" con el sistema celeste.
 
 Mitad superior, tarjeta blanca con título "Reportar un daño" (22px semibold):
-- Fila de tres campos: select "Espacio afectado" con "Cancha de Veteranos Miraflores"; input "Tu identificador" con
-  "vecino-auditor-01"; y un textarea de ancho completo con etiqueta "¿Qué pasó?", valor
+- Fila de tres campos: select "Espacio afectado" con "Cancha de Veteranos Miraflores"; input "Tu DNI" con
+  "12345678"; y un textarea de ancho completo con etiqueta "¿Qué pasó?", valor
   "Tablero de básquet con fisura en el soporte norte, cerca de la entrada." y contador debajo a la derecha
   "23 / 2000 caracteres" en 12px #56718A.
 - Botón primario alineado a la derecha "Enviar reporte".
