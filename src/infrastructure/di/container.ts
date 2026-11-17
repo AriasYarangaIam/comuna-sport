@@ -190,16 +190,24 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
         new FindAvailableSpacesHandler(container.resolve<SpaceReader>('spaceRepository')));
 
     container.register('getReservationHandler', (): GetReservationHandler =>
-        new GetReservationHandler(container.resolve<ReservationReader>('reservationRepository')));
+        new GetReservationHandler(
+            container.resolve<ReservationReader>('reservationRepository'),
+            container.resolve<SpaceReader>('spaceRepository')));
 
     container.register('listUserReservationsHandler', (): ListUserReservationsHandler =>
-        new ListUserReservationsHandler(container.resolve<ReservationReader>('reservationRepository')));
+        new ListUserReservationsHandler(
+            container.resolve<ReservationReader>('reservationRepository'),
+            container.resolve<SpaceReader>('spaceRepository')));
 
     container.register('getIncidentHandler', (): GetIncidentHandler =>
-        new GetIncidentHandler(container.resolve<IncidentReader>('incidentRepository')));
+        new GetIncidentHandler(
+            container.resolve<IncidentReader>('incidentRepository'),
+            container.resolve<SpaceReader>('spaceRepository')));
 
     container.register('listSpaceIncidentsHandler', (): ListSpaceIncidentsHandler =>
-        new ListSpaceIncidentsHandler(container.resolve<IncidentReader>('incidentRepository')));
+        new ListSpaceIncidentsHandler(
+            container.resolve<IncidentReader>('incidentRepository'),
+            container.resolve<SpaceReader>('spaceRepository')));
 
     container.register('queryBus', (): QueryBusService => {
         const bus: QueryBusService = new QueryBusService();

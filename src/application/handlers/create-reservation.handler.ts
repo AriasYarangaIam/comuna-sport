@@ -4,9 +4,9 @@ import { ReservationConfirmedEvent } from "../../domain/events/reservation-confi
 import { EntityNotFoundException } from "../../domain/exceptions/entity-not-found.exception";
 import { ReservationConflictException } from "../../domain/exceptions/reservation-conflict.exception";
 import { ReservationReader, ReservationWriter } from "../../domain/repositories/reservation.repository";
+import { Space } from "../../domain/entities/space.entity";
 import { SpaceReader } from "../../domain/repositories/space.repository";
 import { CostStrategyFactory } from "../../domain/services/cost-calculation/cost-strategy-factory";
-import { SpaceId } from "../../domain/value-objects/space-id.vo";
 import { TimeSlot } from "../../domain/value-objects/time-slot.vo";
 import { UserRole } from "../../domain/value-objects/user-role.vo";
 import { CreateReservationCommand } from "../commands/create-reservation.command";
@@ -25,16 +25,18 @@ export class CreateReservationHandler implements CommandHandler<CreateReservatio
     ) {}
 
     public async execute(command: CreateReservationCommand): Promise<ReservationResponseDto> {
-        const spaceId: SpaceId = SpaceId.create(command.spaceId);
+        // S1/S2: the command carries the public slug and the citizen DNI; the
+        // UUID SpaceId is resolved here, inside the application boundary.
+        const space: Space | null = await this.spaceReader.findBySlug(command.spaceSlug);
+        if (space === null) {
+            throw new EntityNotFoundException(`space not found: ${command.spaceSlug}`, 'SPACE_NOT_FOUND');
+        }
+        const spaceId = space.id;
         const timeSlot: TimeSlot = TimeSlot.create(new Date(command.timeSlot.start), new Date(command.timeSlot.end));
         const role: UserRole = UserRole.create(command.role);
 
-        const space = await this.spaceReader.findById(spaceId);
-        if (space === null) {
-            throw new EntityNotFoundException(`space not found: ${command.spaceId}`);
-        }
         if (!space.isActive) {
-            throw new EntityNotFoundException(`space is inactive: ${command.spaceId}`);
+            throw new EntityNotFoundException(`space is inactive: ${command.spaceSlug}`, 'SPACE_NOT_FOUND');
         }
         if (!space.isSlotWithinAvailability(timeSlot)) {
             throw new Error('time slot is outside the space availability windows');
@@ -42,7 +44,7 @@ export class CreateReservationHandler implements CommandHandler<CreateReservatio
 
         const conflictingReservation = await this.reservationReader.findBySpaceAndSlot(spaceId, timeSlot);
         if (conflictingReservation !== null) {
-            throw new ReservationConflictException(`time slot already reserved for space: ${command.spaceId}`);
+            throw new ReservationConflictException(`time slot already reserved for space: ${command.spaceSlug}`);
         }
 
         const costStrategy = this.costStrategyFactory.createForRole(role.value);
@@ -50,7 +52,7 @@ export class CreateReservationHandler implements CommandHandler<CreateReservatio
 
         const reservation = Reservation.create({
             spaceId: spaceId,
-            userId: command.userId,
+            userId: command.dni,
             timeSlot: timeSlot,
             cost: cost,
             role: role
@@ -66,6 +68,6 @@ export class CreateReservationHandler implements CommandHandler<CreateReservatio
             timeSlot: reservation.timeSlot
         }));
 
-        return toReservationResponseDto(reservation);
+        return toReservationResponseDto(reservation, command.spaceSlug);
     }
 }

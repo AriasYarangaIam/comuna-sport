@@ -4,6 +4,7 @@ import { SpaceId } from "../value-objects/space-id.vo";
 
 export interface SpaceReader {
     findById(id: SpaceId): Promise<Space | null>;
+    findBySlug(slug: string): Promise<Space | null>;
     findAll(): Promise<Space[]>;
     findByAvailability(timeSlot: TimeSlot): Promise<Space[]>;
 }

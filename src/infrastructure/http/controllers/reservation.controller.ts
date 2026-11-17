@@ -9,8 +9,12 @@ import { z } from "zod";
 
 // Validate at Boundaries (API principle #3). Zod is the ONLY runtime validation
 // point; domain/application trust the types.
+// S2/S4: the ONLY citizen identifier is an 8-digit DNI, accepted as input and
+// never echoed back in any response.
+const DNI_PATTERN = /^\d{8}$/;
+
 const reservationBodySchema = z.object({
-    userId: z.string().min(1),
+    dni: z.string().regex(DNI_PATTERN),
     role: z.enum(['NEIGHBOR', 'YOUTH', 'SENIOR', 'PRIVATE_CLUB']),
     timeSlot: z.object({
         start: z.iso.datetime(),
@@ -24,16 +28,16 @@ const reservationIdParamSchema = z.object({
     id: z.string().min(1),
 });
 
-const userIdParamSchema = z.object({
-    userId: z.string().min(1),
+const dniParamSchema = z.object({
+    dni: z.string().regex(DNI_PATTERN),
 });
 
 type ReservationBody = z.infer<typeof reservationBodySchema>;
 type ReservationIdParam = z.infer<typeof reservationIdParamSchema>;
-type UserIdParam = z.infer<typeof userIdParamSchema>;
+type DniParam = z.infer<typeof dniParamSchema>;
 
-const readSpaceIdParam = (req: Request): string => {
-    const raw: string | string[] | undefined = req.params['id'];
+const readSpaceSlugParam = (req: Request): string => {
+    const raw: string | string[] | undefined = req.params['slug'];
     if (Array.isArray(raw)) {
         return raw[0] === undefined ? '' : raw[0];
     }
@@ -54,8 +58,8 @@ export class ReservationController {
             const body: ReservationBody = reservationBodySchema.parse(req.body);
             const command: CreateReservationCommand = {
                 type: 'CREATE_RESERVATION',
-                spaceId: readSpaceIdParam(req),
-                userId: body.userId,
+                spaceSlug: readSpaceSlugParam(req),
+                dni: body.dni,
                 role: body.role,
                 timeSlot: { start: body.timeSlot.start, end: body.timeSlot.end },
             };
@@ -82,10 +86,10 @@ export class ReservationController {
 
     public listByUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const params: UserIdParam = userIdParamSchema.parse(req.params);
+            const params: DniParam = dniParamSchema.parse(req.params);
             const query: ListUserReservationsQuery = {
                 type: 'LIST_USER_RESERVATIONS',
-                userId: params.userId,
+                dni: params.dni,
             };
             const dto: ReservationResponseDto[] = await this.queryBus.execute<ReservationResponseDto[]>(query);
             res.status(200).json(dto);

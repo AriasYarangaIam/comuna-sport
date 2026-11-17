@@ -1,8 +1,11 @@
-import type { Space, SpaceType } from "../../domain/entities/space.entity";
+import { Space, SpaceType } from "../../domain/entities/space.entity";
+import { slugify } from "../../domain/services/slugify";
 import type { TimeSlot } from "../../domain/value-objects/time-slot.vo";
 
+// S1 (odd/tasks/privacy-identifiers-and-copy.md): the public identifier is the
+// slug — the space UUID never leaves the API.
 export interface SpaceResponseDto {
-    id: string;
+    slug: string;
     name: string;
     type: SpaceType;
     capacity: number;
@@ -15,7 +18,7 @@ export interface SpaceResponseDto {
 // become ISO 8601 strings so the HTTP payload stays JSON-safe.
 export const toSpaceResponseDto = (space: Space): SpaceResponseDto => {
     return {
-        id: space.id.value,
+        slug: slugify(space.name),
         name: space.name,
         type: space.type,
         capacity: space.capacity,

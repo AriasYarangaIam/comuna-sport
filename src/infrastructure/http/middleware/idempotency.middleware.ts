@@ -11,7 +11,7 @@ import {
     inMemoryIdempotencyStore,
 } from '../../persistence/in-memory/idempotency.in-memory.store';
 
-// Design Decision D4 (DEVELOPMENT.md §11). POST /spaces/:id/reservations honours
+// Design Decision D4 (DEVELOPMENT.md §11). POST /spaces/:slug/reservations honours
 // a client-supplied `Idempotency-Key`. The guard is store-agnostic: the claim is
 // delegated to an `IdempotencyStore` port, which is what makes the claim atomic
 // (event-loop Map today, `idempotency_keys` PRIMARY KEY with PostgreSQL).

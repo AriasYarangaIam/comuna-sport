@@ -1,9 +1,10 @@
 import type { Incident } from "../../domain/entities/incident.entity";
 
+// S1/S3/S4 (odd/tasks/privacy-identifiers-and-copy.md): the space is addressed
+// by its public slug; the reporter's DNI and the space UUID never leave the API.
 export interface IncidentResponseDto {
     id: string;
-    spaceId: string;
-    reporterId: string;
+    spaceSlug: string;
     description: string;
     state: string;
     createdAt: string;
@@ -12,12 +13,11 @@ export interface IncidentResponseDto {
 
 // Single mapping point for the incident read model — shared by the command
 // handler (create) and the read handlers (get/list), so the HTTP shape can
-// never drift between writes and reads.
-export const toIncidentResponseDto = (incident: Incident): IncidentResponseDto => {
+// never drift between writes and reads. `spaceSlug` is resolved by the caller.
+export const toIncidentResponseDto = (incident: Incident, spaceSlug: string): IncidentResponseDto => {
     return {
         id: incident.id.value,
-        spaceId: incident.spaceId.value,
-        reporterId: incident.reporterId,
+        spaceSlug: spaceSlug,
         description: incident.description,
         state: incident.getState(),
         createdAt: incident.createdAt.toISOString(),

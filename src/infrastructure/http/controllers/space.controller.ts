@@ -8,8 +8,11 @@ import { z } from "zod";
 
 // Validate at Boundaries (API principle #3). Zod is the ONLY runtime validation
 // point; domain/application trust the types.
-const spaceIdParamSchema = z.object({
-    id: z.string().min(1),
+// S1 (odd/tasks/privacy-identifiers-and-copy.md): the path parameter is the
+// public slug; presence is all that is proven here, an unknown slug is the
+// handlers' 404 SPACE_NOT_FOUND.
+const spaceSlugParamSchema = z.object({
+    slug: z.string().min(1),
 });
 
 // Z-suffixed ISO 8601 — the SAME shape the POST body uses for timeSlot bounds.
@@ -18,7 +21,7 @@ const availabilityQuerySchema = z.object({
     end: z.iso.datetime(),
 });
 
-type SpaceIdParam = z.infer<typeof spaceIdParamSchema>;
+type SpaceSlugParam = z.infer<typeof spaceSlugParamSchema>;
 type AvailabilityQuery = z.infer<typeof availabilityQuerySchema>;
 
 // Query strings arrive as `string | string[] | ParsedQs | ... | undefined`:
@@ -55,10 +58,10 @@ export class SpaceController {
 
     public getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const params: SpaceIdParam = spaceIdParamSchema.parse(req.params);
+            const params: SpaceSlugParam = spaceSlugParamSchema.parse(req.params);
             const query: GetSpaceQuery = {
                 type: 'GET_SPACE',
-                spaceId: params.id,
+                spaceSlug: params.slug,
             };
             const dto: SpaceResponseDto = await this.queryBus.execute<SpaceResponseDto>(query);
             res.status(200).json(dto);
