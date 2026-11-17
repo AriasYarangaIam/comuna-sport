@@ -82,7 +82,7 @@ GET  /spaces/:slug/incidents        → IncidentResponseDto[]   // sin spaceId, 
 | T5 | S6, S7 | SPA: eliminar Lectura Fácil completo + "Referencia de operación" + textos técnicos del manual de ayuda; tests afectados | inline (worker provider unavailable) | `a366781` |
 | T6 | S1–S7 | Verificación conjunto: typecheck + build + ambas suites, evidencia por S# | inline | — |
 | T7 | S1–S7 | Documentación: `DESIGN.md` (contratos, §9.4) y `DATABASE.md` (004, DDL, drift) | inline | — |
-| T8 | S1–S7 | Work-unit commits en la rama feature (sin push, sin PR) | inline | `9b86e58` · `466dfd0` · `a366781` · docs slice |
+| T8 | S1–S7 | Work-unit commits en la rama feature (sin push, sin PR) | inline | `9b86e58` · `466dfd0` · `a366781` · `09c201a` |
 
 ### Delivery strategy — slice boundary
 
@@ -99,7 +99,7 @@ Slice boundaries (recorded before the docs commit, per the runtime slice check):
 | Pre-existing docs | `9b86e58` | 3 files, +144/−4 | root `README.md`, `tests/README.md`, `DEPLOYMENT.md` |
 | Unit A (API + DB + API tests) | `466dfd0` | 33 files, +642/−182 | `src/**`, `db/004`, `tests/**` |
 | Unit B (SPA) | `a366781` | 28 files, +258/−365 | `apps/web/**` |
-| Feature docs (T7/T8) | pending | — | `DESIGN.md` + this document (`DATABASE.md` stays untracked per maintainer directive) |
+| Feature docs (T7/T8) | `09c201a` | 2 files, +198/−63 | `DESIGN.md` + this document (`DATABASE.md` stays untracked per maintainer directive) |
 
 The two feature slices exceed the ~400 authored-line guideline because the wire-contract
 change (S1–S4) is atomic across controllers, DTOs, handlers, adapters, routes and their
