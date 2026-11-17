@@ -1,11 +1,9 @@
 import { Suspense, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Compass, HelpCircle } from 'lucide-react';
-import { useUiStore } from '../../stores/ui';
 import { PageSkeleton } from '../ui/Skeleton';
 import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
-import { ReadingModeToggle } from './ReadingModeToggle';
 import { TopNav } from './TopNav';
 
 function ScrollToTop() {
@@ -26,16 +24,6 @@ function ScrollToTop() {
 }
 
 export function AppShell() {
-  const readingMode = useUiStore((state) => state.readingMode);
-
-  useEffect(() => {
-    if (readingMode) {
-      document.documentElement.dataset['reading'] = 'large';
-    } else {
-      delete document.documentElement.dataset['reading'];
-    }
-  }, [readingMode]);
-
   return (
     <div className="flex min-h-dvh flex-col">
       <ScrollToTop />
@@ -68,7 +56,6 @@ export function AppShell() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <ReadingModeToggle />
             <Link
               to="/ayuda"
               className="flex h-12 w-12 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-sky-50 hover:text-ink md:hidden"

@@ -23,7 +23,7 @@ export function ReceiptPage() {
     isFetching,
   } = useReservation(reservationId);
   const { data: space, isPending: spacePending } = useSpace(
-    reservation?.spaceId,
+    reservation?.spaceSlug,
   );
 
   if (isPending) {
@@ -121,13 +121,13 @@ export function ReceiptPage() {
           actions={
             <>
               <Link
-                to={`/mis-reservas?userId=${encodeURIComponent(reservation.userId)}`}
+                to="/mis-reservas"
                 className={buttonStyles({ variant: 'secondary' })}
               >
                 Ver mis reservas
               </Link>
               <Link
-                to={`/disponibilidad?spaceId=${encodeURIComponent(reservation.spaceId)}`}
+                to={`/disponibilidad?spaceSlug=${encodeURIComponent(reservation.spaceSlug)}`}
                 className={buttonStyles()}
               >
                 Reservar otro horario

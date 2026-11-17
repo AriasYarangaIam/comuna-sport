@@ -177,38 +177,6 @@
   }
 }
 
-/* Modo Lectura Fácil: tipografía base 18/28, cuerpo en peso 500 y objetivos
-   táctiles de 56 px. Se aplica sobre <html data-reading="large">. */
-html[data-reading='large'] .text-body {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  font-weight: 500;
-}
-
-html[data-reading='large'] .text-small {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 500;
-}
-
-html[data-reading='large'] .text-caption {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 500;
-}
-
-html[data-reading='large'] button,
-html[data-reading='large'] a[data-touch-target],
-html[data-reading='large'] input,
-html[data-reading='large'] select,
-html[data-reading='large'] textarea {
-  min-height: 56px;
-}
-
-html[data-reading='large'] [data-reading-hide] {
-  display: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

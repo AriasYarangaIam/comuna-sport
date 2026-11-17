@@ -4,7 +4,7 @@ import type { ReservationBody } from '../types/api';
 import { makeIncident, makeReservation, spacesFixture } from './fixtures';
 
 export interface CapturedReservationRequest {
-  spaceId: string;
+  spaceSlug: string;
   idempotencyKey: string | null;
   body: ReservationBody;
 }
@@ -32,14 +32,14 @@ const jsonError = (
 export const handlers = [
   http.get('*/api/spaces', () => HttpResponse.json(spacesFixture)),
 
-  // Debe declararse antes que `/spaces/:spaceId` porque MSW respeta el orden.
+  // Debe declararse antes que `/spaces/:spaceSlug` porque MSW respeta el orden.
   http.get('*/api/spaces/availability', () =>
     HttpResponse.json(spacesFixture.filter((space) => space.isActive)),
   ),
 
-  http.get('*/api/spaces/:spaceId', ({ params }) => {
+  http.get('*/api/spaces/:spaceSlug', ({ params }) => {
     const space = spacesFixture.find(
-      (candidate) => candidate.id === params.spaceId,
+      (candidate) => candidate.slug === params.spaceSlug,
     );
     return space === undefined
       ? jsonError(404, 'SPACE_NOT_FOUND')
@@ -47,19 +47,18 @@ export const handlers = [
   }),
 
   http.post(
-    '*/api/spaces/:spaceId/reservations',
+    '*/api/spaces/:spaceSlug/reservations',
     async ({ params, request }) => {
       const body = (await request.json()) as ReservationBody;
       captured.reservationRequests.push({
-        spaceId: String(params.spaceId),
+        spaceSlug: String(params.spaceSlug),
         idempotencyKey: request.headers.get('Idempotency-Key'),
         body,
       });
       return HttpResponse.json(
         makeReservation({
           id: `reservation-${captured.reservationRequests.length}`,
-          spaceId: String(params.spaceId),
-          userId: body.userId,
+          spaceSlug: String(params.spaceSlug),
           role: body.role,
           timeSlot: body.timeSlot,
           cost: {
@@ -81,24 +80,23 @@ export const handlers = [
     HttpResponse.json(makeReservation({ id: String(params.reservationId) })),
   ),
 
-  http.get('*/api/users/:userId/reservations', () => HttpResponse.json([])),
+  http.get('*/api/users/:dni/reservations', () => HttpResponse.json([])),
 
-  http.get('*/api/spaces/:spaceId/incidents', () =>
+  http.get('*/api/spaces/:spaceSlug/incidents', () =>
     HttpResponse.json([makeIncident()]),
   ),
 
   http.post('*/api/incidents', async ({ request }) => {
     const body = (await request.json()) as {
-      spaceId: string;
-      reporterId: string;
+      spaceSlug: string;
+      dni: string;
       description: string;
     };
     captured.incidentRequests.push(body);
     return HttpResponse.json(
       makeIncident({
         id: 'incident-new',
-        spaceId: body.spaceId,
-        reporterId: body.reporterId,
+        spaceSlug: body.spaceSlug,
         description: body.description,
       }),
       { status: 201 },

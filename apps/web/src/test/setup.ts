@@ -13,11 +13,7 @@ afterEach(() => {
   server.resetHandlers();
   resetCaptured();
   window.localStorage.clear();
-  useUiStore.setState({
-    readingMode: false,
-    lastUserId: '',
-    lastReporterId: '',
-  });
+  useUiStore.setState({ lastDni: '' });
 });
 
 afterAll(() => {

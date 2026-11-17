@@ -28,8 +28,8 @@ import { IncidentTimeline } from '../../components/domain/IncidentTimeline';
 import { IncidentStatusBadge } from '../../components/domain/StatusBadge';
 
 interface IncidentErrors {
-  spaceId?: string;
-  reporterId?: string;
+  spaceSlug?: string;
+  dni?: string;
   description?: string;
 }
 
@@ -38,8 +38,8 @@ const shortCode = (id: string): string =>
 
 export function IncidentsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const lastReporterId = useUiStore((state) => state.lastReporterId);
-  const setLastReporterId = useUiStore((state) => state.setLastReporterId);
+  const lastDni = useUiStore((state) => state.lastDni);
+  const setLastDni = useUiStore((state) => state.setLastDni);
 
   const {
     data: spaces,
@@ -50,9 +50,9 @@ export function IncidentsPage() {
     isFetching: spacesFetching,
   } = useSpaces();
 
-  const querySpaceId = searchParams.get('spaceId') ?? '';
-  const [spaceId, setSpaceId] = useState(querySpaceId);
-  const [reporterId, setReporterId] = useState(lastReporterId);
+  const querySpaceSlug = searchParams.get('spaceSlug') ?? '';
+  const [spaceSlug, setSpaceSlug] = useState(querySpaceSlug);
+  const [dni, setDni] = useState(lastDni);
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<IncidentErrors>({});
   const [serverError, setServerError] = useState<UserFacingError | null>(null);
@@ -63,19 +63,19 @@ export function IncidentsPage() {
   const initialisedSpace = useRef(false);
 
   const selectedSpace = useMemo(
-    () => (spaces ?? []).find((space) => space.id === spaceId),
-    [spaces, spaceId],
+    () => (spaces ?? []).find((space) => space.slug === spaceSlug),
+    [spaces, spaceSlug],
   );
 
   useEffect(() => {
     if (spacesPending || spaces === undefined || initialisedSpace.current) {
       return;
     }
-    const fromQuery = spaces.find((space) => space.id === querySpaceId);
+    const fromQuery = spaces.find((space) => space.slug === querySpaceSlug);
     const fallback = spaces.find((space) => space.isActive) ?? spaces[0];
-    setSpaceId(fromQuery?.id ?? fallback?.id ?? '');
+    setSpaceSlug(fromQuery?.slug ?? fallback?.slug ?? '');
     initialisedSpace.current = true;
-  }, [spacesPending, spaces, querySpaceId]);
+  }, [spacesPending, spaces, querySpaceSlug]);
 
   const {
     data: incidents,
@@ -84,7 +84,7 @@ export function IncidentsPage() {
     error: incidentsErrorObject,
     refetch: refetchIncidents,
     isFetching: incidentsFetching,
-  } = useSpaceIncidents(spaceId);
+  } = useSpaceIncidents(spaceSlug);
 
   const mutation = useCreateIncident();
 
@@ -121,11 +121,13 @@ export function IncidentsPage() {
 
   const validate = (): boolean => {
     const next: IncidentErrors = {};
-    if (spaceId === '') {
-      next.spaceId = 'Selecciona el espacio afectado.';
+    if (spaceSlug === '') {
+      next.spaceSlug = 'Selecciona el espacio afectado.';
     }
-    if (reporterId.trim() === '') {
-      next.reporterId = 'Ingresa tu identificador.';
+    if (dni.trim() === '') {
+      next.dni = 'Ingresa tu DNI.';
+    } else if (!/^\d{8}$/.test(dni.trim())) {
+      next.dni = 'El DNI debe tener exactamente 8 dígitos.';
     }
     const trimmedDescription = description.trim();
     if (trimmedDescription === '') {
@@ -163,11 +165,11 @@ export function IncidentsPage() {
     }
     setServerError(null);
     setSuccessMessage(null);
-    setLastReporterId(reporterId.trim());
+    setLastDni(dni.trim());
     mutation.mutate(
       {
-        spaceId: selectedSpace.id,
-        reporterId: reporterId.trim(),
+        spaceSlug: selectedSpace.slug,
+        dni: dni.trim(),
         description: description.trim(),
       },
       {
@@ -178,7 +180,7 @@ export function IncidentsPage() {
           );
           setNewIncidentId(incident.id);
           setSelectedIncidentId(incident.id);
-          setSearchParams({ spaceId: incident.spaceId });
+          setSearchParams({ spaceSlug: incident.spaceSlug });
         },
         onError: (error: unknown) => {
           setServerError(toUserFacingError(error, 'incidents'));
@@ -278,21 +280,21 @@ export function IncidentsPage() {
               <Select
                 id="incident-space"
                 label="Espacio afectado"
-                value={spaceId}
+                value={spaceSlug}
                 onChange={(event) => {
-                  const nextSpaceId = event.target.value;
-                  setSpaceId(nextSpaceId);
-                  setSearchParams({ spaceId: nextSpaceId });
-                  setErrors((current) => ({ ...current, spaceId: undefined }));
+                  const nextSpaceSlug = event.target.value;
+                  setSpaceSlug(nextSpaceSlug);
+                  setSearchParams({ spaceSlug: nextSpaceSlug });
+                  setErrors((current) => ({ ...current, spaceSlug: undefined }));
                 }}
-                error={errors.spaceId}
+                error={errors.spaceSlug}
                 required
               >
                 <option value="">Selecciona un espacio</option>
                 {(spaces ?? []).map((space) => (
                   <option
-                    key={space.id}
-                    value={space.id}
+                    key={space.slug}
+                    value={space.slug}
                     disabled={!space.isActive}
                   >
                     {space.name}
@@ -302,20 +304,20 @@ export function IncidentsPage() {
               </Select>
 
               <TextInput
-                id="incident-reporter"
-                label="Tu identificador"
-                value={reporterId}
+                id="incident-dni"
+                label="Tu DNI"
+                value={dni}
                 onChange={(event) => {
-                  setReporterId(event.target.value);
+                  setDni(event.target.value);
                   setErrors((current) => ({
                     ...current,
-                    reporterId: undefined,
+                    dni: undefined,
                   }));
                 }}
-                placeholder="vecino-auditor-01"
-                hint="No es una cuenta: identifica quién reporta el daño."
-                error={errors.reporterId}
-                autoComplete="username"
+                placeholder="12345678"
+                hint="Ocho dígitos, sin puntos ni espacios."
+                error={errors.dni}
+                autoComplete="off"
                 required
               />
 
@@ -478,7 +480,6 @@ export function IncidentsPage() {
                             {incident.description}
                           </p>
                           <p className="mt-1 text-caption text-ink-muted">
-                            Reportó {incident.reporterId} ·{' '}
                             {formatDateTime(incident.createdAt)}
                           </p>
                         </button>

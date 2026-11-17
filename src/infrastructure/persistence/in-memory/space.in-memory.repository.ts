@@ -3,6 +3,7 @@ import { Space } from "../../../domain/entities/space.entity";
 import type { SpaceType } from "../../../domain/entities/space.entity";
 import { SpaceReader, SpaceWriter } from "../../../domain/repositories/space.repository";
 import { SpaceId } from "../../../domain/value-objects/space-id.vo";
+import { slugify } from "../../../domain/services/slugify";
 import { BUSINESS_TIME_ZONE, TimeSlot } from "../../../domain/value-objects/time-slot.vo";
 
 // DATABASE.md §8 pins the reference catalog to a rolling horizon: one window per
@@ -152,6 +153,15 @@ export class InMemorySpaceRepository implements SpaceReader, SpaceWriter {
 
     public async findById(id: SpaceId): Promise<Space | null> {
         const found: Space | undefined = this.storage.get(id.value);
+        return found === undefined ? null : found;
+    }
+
+    // S1: the public identifier is the slug — compared against slugify(name)
+    // so it agrees with the PostgreSQL column produced by migration 004.
+    public async findBySlug(slug: string): Promise<Space | null> {
+        const found = [...this.storage.values()].find(
+            (space: Space): boolean => slugify(space.name) === slug
+        );
         return found === undefined ? null : found;
     }
 

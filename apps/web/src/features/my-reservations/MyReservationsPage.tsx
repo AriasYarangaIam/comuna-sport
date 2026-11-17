@@ -35,12 +35,12 @@ type Filter = 'all' | 'active' | 'inactive';
 
 export function MyReservationsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const lastUserId = useUiStore((state) => state.lastUserId);
-  const setLastUserId = useUiStore((state) => state.setLastUserId);
+  const lastDni = useUiStore((state) => state.lastDni);
+  const setLastDni = useUiStore((state) => state.setLastDni);
 
-  const initialUserId = searchParams.get('userId') ?? lastUserId;
-  const [input, setInput] = useState(initialUserId);
-  const [activeUserId, setActiveUserId] = useState(initialUserId);
+  const initialDni = searchParams.get('dni') ?? lastDni;
+  const [input, setInput] = useState(initialDni);
+  const [activeDni, setActiveDni] = useState(initialDni);
   const [inputError, setInputError] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -51,12 +51,12 @@ export function MyReservationsPage() {
     isError,
     error,
     refetch,
-  } = useUserReservations(activeUserId);
+  } = useUserReservations(activeDni);
   const { data: spaces } = useSpaces();
 
   const spaceNames = useMemo(
     () =>
-      new Map((spaces ?? []).map((space) => [space.id, space])),
+      new Map((spaces ?? []).map((space) => [space.slug, space])),
     [spaces],
   );
 
@@ -90,13 +90,17 @@ export function MyReservationsPage() {
     event.preventDefault();
     const trimmed = input.trim();
     if (trimmed === '') {
-      setInputError('Ingresa tu identificador para buscar tus reservas.');
+      setInputError('Ingresa tu DNI para buscar tus reservas.');
+      return;
+    }
+    if (!/^\d{8}$/.test(trimmed)) {
+      setInputError('El DNI debe tener exactamente 8 dígitos.');
       return;
     }
     setInputError(undefined);
-    setActiveUserId(trimmed);
-    setLastUserId(trimmed);
-    setSearchParams({ userId: trimmed });
+    setActiveDni(trimmed);
+    setLastDni(trimmed);
+    setSearchParams({ dni: trimmed });
     setFilter('all');
   };
 
@@ -105,8 +109,8 @@ export function MyReservationsPage() {
       <header>
         <h1 className="text-headline-lg text-ink md:text-display">Mis reservas</h1>
         <p className="mt-2 max-w-2xl text-pretty text-body text-ink-soft">
-          Consulta el historial de reservas asociado a tu identificador. No
-          necesitas cuenta ni contraseña.
+          Consulta el historial de reservas asociado a tu DNI. No necesitas
+          cuenta ni contraseña.
         </p>
       </header>
 
@@ -117,18 +121,18 @@ export function MyReservationsPage() {
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <TextInput
-            id="reservations-user-id"
-            label="ID de usuario o DNI"
+            id="reservations-dni"
+            label="DNI"
             value={input}
             onChange={(event) => {
               setInput(event.target.value);
               setInputError(undefined);
             }}
-            placeholder="user-vecino-4589"
-            hint="El mismo identificador que usaste al reservar."
+            placeholder="12345678"
+            hint="Ocho dígitos, sin puntos ni espacios."
             error={inputError}
             containerClassName="flex-1"
-            autoComplete="username"
+            autoComplete="off"
           />
           <Button type="submit" className="sm:mb-0">
             <Search className="h-4 w-4" aria-hidden="true" />
@@ -137,11 +141,11 @@ export function MyReservationsPage() {
         </div>
       </form>
 
-      {activeUserId.trim() === '' ? (
+      {activeDni.trim() === '' ? (
         <div className="mt-6">
-          <InlineAlert tone="info" title="Ingresa tu identificador">
-            Usa el mismo ID o DNI con el que registraste la reserva. Lo
-            encuentras en el comprobante digital.
+          <InlineAlert tone="info" title="Ingresa tu DNI">
+            Usa el mismo DNI con el que registraste la reserva. Lo encuentras
+            en el comprobante digital.
           </InlineAlert>
         </div>
       ) : (
@@ -149,7 +153,7 @@ export function MyReservationsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 id="lista-reservas" className="text-headline-md text-ink">
-                Reservas de {activeUserId}
+                Reservas de {activeDni}
               </h2>
               <p className="mt-1 text-small text-ink-soft" role="status" aria-live="polite">
                 {isPending
@@ -215,12 +219,12 @@ export function MyReservationsPage() {
                 icon={SearchX}
                 title={
                   counts.all === 0
-                    ? 'Aún no tienes reservas con este identificador'
+                    ? 'Aún no tienes reservas con este DNI'
                     : 'No hay reservas con este filtro'
                 }
                 description={
                   counts.all === 0
-                    ? 'Cuando reserves un espacio, aparecerá aquí con su comprobante digital. Revisa que el identificador sea el mismo que usaste.'
+                    ? 'Cuando reserves un espacio, aparecerá aquí con su comprobante digital. Revisa que el DNI sea el mismo que usaste.'
                     : 'Cambia el filtro para ver el resto de tus reservas.'
                 }
                 action={
@@ -244,11 +248,11 @@ export function MyReservationsPage() {
                     key={reservation.id}
                     reservation={reservation}
                     spaceName={
-                      spaceNames.get(reservation.spaceId)?.name ??
+                      spaceNames.get(reservation.spaceSlug)?.name ??
                       'Espacio deportivo municipal'
                     }
                     spaceType={
-                      spaceNames.get(reservation.spaceId)?.type ?? null
+                      spaceNames.get(reservation.spaceSlug)?.type ?? null
                     }
                   />
                 ))}
@@ -323,7 +327,7 @@ function ReservationRow({
             Ver detalle
           </Link>
           <Link
-            to={`/incidentes?spaceId=${encodeURIComponent(reservation.spaceId)}`}
+            to={`/incidentes?spaceSlug=${encodeURIComponent(reservation.spaceSlug)}`}
             className={buttonStyles({ variant: 'ghost', size: 'sm' })}
           >
             <Wrench className="h-4 w-4" aria-hidden="true" />

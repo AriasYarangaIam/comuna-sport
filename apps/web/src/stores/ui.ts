@@ -1,33 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// S4 (odd/tasks/privacy-identifiers-and-copy.md): the last citizen identifier
+// typed by the user is a convenience only — it never comes back from the API.
 interface UiState {
-  readingMode: boolean;
-  lastUserId: string;
-  lastReporterId: string;
-  toggleReadingMode: () => void;
-  setLastUserId: (userId: string) => void;
-  setLastReporterId: (reporterId: string) => void;
+  lastDni: string;
+  setLastDni: (dni: string) => void;
 }
 
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      readingMode: false,
-      lastUserId: '',
-      lastReporterId: '',
-      toggleReadingMode: () =>
-        set((state) => ({ readingMode: !state.readingMode })),
-      setLastUserId: (lastUserId) => set({ lastUserId }),
-      setLastReporterId: (lastReporterId) => set({ lastReporterId }),
+      lastDni: '',
+      setLastDni: (lastDni) => set({ lastDni }),
     }),
     {
       name: 'comunasport-ui',
-      partialize: (state) => ({
-        readingMode: state.readingMode,
-        lastUserId: state.lastUserId,
-        lastReporterId: state.lastReporterId,
-      }),
+      partialize: (state) => ({ lastDni: state.lastDni }),
     },
   ),
 );

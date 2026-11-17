@@ -9,9 +9,13 @@ import { z } from "zod";
 
 // Validate at Boundaries (API principle #3). Zod is the ONLY runtime validation
 // point; domain/application trust the types.
+// S1/S3/S4: the space is addressed by its public slug and the ONLY citizen
+// identifier is an 8-digit DNI — accepted as input, never echoed back.
+const DNI_PATTERN = /^\d{8}$/;
+
 const incidentBodySchema = z.object({
-    spaceId: z.string().min(1),
-    reporterId: z.string().min(1),
+    spaceSlug: z.string().min(1),
+    dni: z.string().regex(DNI_PATTERN),
     description: z.string().min(1).max(2000),
 });
 
@@ -21,13 +25,13 @@ const incidentIdParamSchema = z.object({
     id: z.string().min(1),
 });
 
-const spaceIdParamSchema = z.object({
-    id: z.string().min(1),
+const spaceSlugParamSchema = z.object({
+    slug: z.string().min(1),
 });
 
 type IncidentBody = z.infer<typeof incidentBodySchema>;
 type IncidentIdParam = z.infer<typeof incidentIdParamSchema>;
-type SpaceIdParam = z.infer<typeof spaceIdParamSchema>;
+type SpaceSlugParam = z.infer<typeof spaceSlugParamSchema>;
 
 export class IncidentController {
     private readonly commandBus: CommandBus;
@@ -43,8 +47,8 @@ export class IncidentController {
             const body: IncidentBody = incidentBodySchema.parse(req.body);
             const command: CreateIncidentCommand = {
                 type: 'CREATE_INCIDENT',
-                spaceId: body.spaceId,
-                reporterId: body.reporterId,
+                spaceSlug: body.spaceSlug,
+                dni: body.dni,
                 description: body.description,
             };
             const dto: IncidentResponseDto = await this.commandBus.execute<IncidentResponseDto>(command);
@@ -70,10 +74,10 @@ export class IncidentController {
 
     public listBySpace = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const params: SpaceIdParam = spaceIdParamSchema.parse(req.params);
+            const params: SpaceSlugParam = spaceSlugParamSchema.parse(req.params);
             const query: ListSpaceIncidentsQuery = {
                 type: 'LIST_SPACE_INCIDENTS',
-                spaceId: params.id,
+                spaceSlug: params.slug,
             };
             const dto: IncidentResponseDto[] = await this.queryBus.execute<IncidentResponseDto[]>(query);
             res.status(200).json(dto);

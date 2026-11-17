@@ -1,6 +1,7 @@
 /// <reference types="node" />
 /// <reference types="jest" />
 
+import { slugify } from "../../src/domain/services/slugify";
 import { randomUUID } from "crypto";
 
 import { buildContainer } from "../../src/infrastructure/di/container";
@@ -16,7 +17,7 @@ interface SpaceWindowBody {
 }
 
 interface SpaceBody {
-    readonly id: string;
+    readonly slug: string;
     readonly name: string;
     readonly type: string;
     readonly capacity: number;
@@ -27,8 +28,7 @@ interface SpaceBody {
 
 interface ReservationBody {
     readonly id?: string;
-    readonly spaceId?: string;
-    readonly userId?: string;
+    readonly spaceSlug?: string;
     readonly role?: string;
     readonly timeSlot?: { readonly start: string; readonly end: string };
     readonly cost?: { readonly amount: number; readonly currency: string };
@@ -43,8 +43,7 @@ interface ReservationBody {
 
 interface IncidentBody {
     readonly id?: string;
-    readonly spaceId?: string;
-    readonly reporterId?: string;
+    readonly spaceSlug?: string;
     readonly description?: string;
     readonly state?: string;
     readonly createdAt?: string;
@@ -101,13 +100,14 @@ const assertSpaceShape = (body: SpaceBody): void => {
         'availabilityWindows',
         'basePrice',
         'capacity',
-        'id',
         'isActive',
         'name',
+        'slug',
         'type',
     ]);
     expect(Object.keys(body.basePrice).sort()).toEqual(['amount', 'currency']);
-    expect(typeof body.id).toBe('string');
+    expect(typeof body.slug).toBe('string');
+    expect(body).not.toHaveProperty('id');
     expect(body.name).not.toBe('');
     expect(typeof body.type).toBe('string');
     expect(typeof body.capacity).toBe('number');
@@ -174,24 +174,24 @@ const bandInsideWindow = (space: Space): { readonly start: string; readonly end:
 };
 
 const postReservation = async (
-    spaceId: string,
+    spaceSlug: string,
     slot: { readonly start: string; readonly end: string },
     role: string,
-    userId: string,
+    dni: string,
     key: string,
 ): Promise<SuperTestResponse> => {
     return request(app)
-        .post(`/spaces/${spaceId}/reservations`)
+        .post(`/spaces/${spaceSlug}/reservations`)
         .set('content-type', 'application/json')
         .set('idempotency-key', key)
-        .send({ userId: userId, role: role, timeSlot: slot });
+        .send({ dni: dni, role: role, timeSlot: slot });
 };
 
-const postIncident = async (spaceId: string, description: string): Promise<SuperTestResponse> => {
+const postIncident = async (spaceSlug: string, description: string): Promise<SuperTestResponse> => {
     return request(app)
         .post('/incidents')
         .set('content-type', 'application/json')
-        .send({ spaceId: spaceId, reporterId: 'user-read-api', description: description });
+        .send({ spaceSlug: spaceSlug, dni: '12345678', description: description });
 };
 
 describe('E2E — GET /spaces', (): void => {
@@ -210,31 +210,33 @@ describe('E2E — GET /spaces', (): void => {
     });
 });
 
-describe('E2E — GET /spaces/:id', (): void => {
-    it('seeded id → 200 with the same space', async (): Promise<void> => {
+describe('E2E — GET /spaces/:slug', (): void => {
+    it('seeded slug → 200 with the same space', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
-        const res = await request(app).get(`/spaces/${space.id.value}`);
+        const res = await request(app).get(`/spaces/${slugify(space.name)}`);
         expect(res.status).toBe(200);
         const body = res.body as SpaceBody;
         assertSpaceShape(body);
-        expect(body.id).toBe(space.id.value);
+        expect(body.slug).toBe(slugify(space.name));
         expect(body.name).toBe('Cancha de Veteranos Miraflores');
         expect(body.type).toBe('CANCHA_FUTBOL');
         expect(body.capacity).toBe(space.capacity);
         expect(body.basePrice.amount).toBe(space.basePrice.amount);
     });
 
-    it('unknown but valid UUID v4 → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
+    it('unknown slug → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
         const res = await request(app).get(`/spaces/${randomUUID()}`);
         expect(res.status).toBe(404);
         expect((res.body as ErrorBody).error.code).toBe('SPACE_NOT_FOUND');
         assertAPIErrorShape(res);
     });
 
-    it('malformed id → 400 BAD_REQUEST (APIError shape)', async (): Promise<void> => {
+    it('unknown non-slug string → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
+        // S1: there is no UUID validation on the path anymore — anything that
+        // is not a seeded slug resolves to the same 404.
         const res = await request(app).get('/spaces/not-a-uuid');
-        expect(res.status).toBe(400);
-        expect((res.body as ErrorBody).error.code).toBe('BAD_REQUEST');
+        expect(res.status).toBe(404);
+        expect((res.body as ErrorBody).error.code).toBe('SPACE_NOT_FOUND');
         assertAPIErrorShape(res);
     });
 });
@@ -247,7 +249,7 @@ describe('E2E — GET /spaces/availability', (): void => {
         expect(res.status).toBe(200);
         const spaces = res.body as SpaceBody[];
         expect(Array.isArray(spaces)).toBe(true);
-        expect(spaces.map((entry: SpaceBody): string => entry.id)).toContain(space.id.value);
+        expect(spaces.map((entry: SpaceBody): string => entry.slug)).toContain(slugify(space.name));
         for (const entry of spaces) {
             assertSpaceShape(entry);
         }
@@ -271,12 +273,12 @@ describe('E2E — GET /spaces/availability', (): void => {
     });
 });
 
-describe('E2E — GET /reservations/:id and GET /users/:userId/reservations', (): void => {
-    it('created reservation is readable by id and listed for its user', async (): Promise<void> => {
+describe('E2E — GET /reservations/:id and GET /users/:dni/reservations', (): void => {
+    it('created reservation is readable by id and listed for its DNI', async (): Promise<void> => {
         const space = await seedSpace('Pista Comunal Barranco');
         const band = bandInsideWindow(space);
-        const userId = 'user-read-api';
-        const created = await postReservation(space.id.value, band, 'NEIGHBOR', userId, randomUUID());
+        const dni = '87654321';
+        const created = await postReservation(slugify(space.name), band, 'NEIGHBOR', dni, randomUUID());
         expect(created.status).toBe(201);
         const createdBody = created.body as ReservationBody;
         expect(createdBody.error).toBeUndefined();
@@ -286,8 +288,9 @@ describe('E2E — GET /reservations/:id and GET /users/:userId/reservations', ()
         expect(byId.status).toBe(200);
         const byIdBody = byId.body as ReservationBody;
         expect(byIdBody.id).toBe(createdBody.id);
-        expect(byIdBody.spaceId).toBe(createdBody.spaceId);
-        expect(byIdBody.userId).toBe(userId);
+        expect(byIdBody.spaceSlug).toBe(slugify(space.name));
+        expect(byIdBody).not.toHaveProperty('userId');
+        expect(byIdBody).not.toHaveProperty('dni');
         expect(byIdBody.role).toBe('NEIGHBOR');
         if (byIdBody.cost === undefined || createdBody.cost === undefined) {
             throw new Error('unexpected body shape: cost missing');
@@ -295,7 +298,7 @@ describe('E2E — GET /reservations/:id and GET /users/:userId/reservations', ()
         expect(byIdBody.cost.amount).toBe(createdBody.cost.amount);
         expect(byIdBody.cost.currency).toBe('PEN');
 
-        const byUser = await request(app).get(`/users/${userId}/reservations`);
+        const byUser = await request(app).get(`/users/${dni}/reservations`);
         expect(byUser.status).toBe(200);
         const byUserBody = byUser.body as ReservationBody[];
         expect(Array.isArray(byUserBody)).toBe(true);
@@ -310,10 +313,10 @@ describe('E2E — GET /reservations/:id and GET /users/:userId/reservations', ()
     });
 });
 
-describe('E2E — GET /incidents/:id and GET /spaces/:id/incidents', (): void => {
+describe('E2E — GET /incidents/:id and GET /spaces/:slug/incidents', (): void => {
     it('created incident is readable by id and listed for its space', async (): Promise<void> => {
         const space = await seedSpace('Losas Comunitarias Barranco');
-        const created = await postIncident(space.id.value, 'Broken hoop');
+        const created = await postIncident(slugify(space.name), 'Broken hoop');
         expect(created.status).toBe(201);
         const createdBody = created.body as IncidentBody;
         expect(createdBody.error).toBeUndefined();
@@ -323,10 +326,11 @@ describe('E2E — GET /incidents/:id and GET /spaces/:id/incidents', (): void =>
         expect(byId.status).toBe(200);
         const byIdBody = byId.body as IncidentBody;
         expect(byIdBody.id).toBe(createdBody.id);
-        expect(byIdBody.spaceId).toBe(space.id.value);
+        expect(byIdBody.spaceSlug).toBe(slugify(space.name));
+        expect(byIdBody).not.toHaveProperty('reporterId');
         expect(byIdBody.state).toBe('UNDER_REVIEW');
 
-        const bySpace = await request(app).get(`/spaces/${space.id.value}/incidents`);
+        const bySpace = await request(app).get(`/spaces/${slugify(space.name)}/incidents`);
         expect(bySpace.status).toBe(200);
         const bySpaceBody = bySpace.body as IncidentBody[];
         expect(Array.isArray(bySpaceBody)).toBe(true);

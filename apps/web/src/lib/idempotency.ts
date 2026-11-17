@@ -1,7 +1,7 @@
 /**
  * Ciclo de vida de la Idempotency-Key (DESIGN.md §6.2):
  * - Se genera al abrir el asistente.
- * - Se rota cuando cambian userId, role o timeSlot, o tras un 422 payload_mismatch.
+ * - Se rota cuando cambian dni, role o timeSlot, o tras un 422 payload_mismatch.
  * - Un reintento o doble toque reutiliza la misma llave.
  */
 export const createIdempotencyKey = (): string => {

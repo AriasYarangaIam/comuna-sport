@@ -21,7 +21,7 @@ export type {
 };
 
 export interface ReservationBody {
-  userId: string;
+  dni: string;
   role: UserRoleType;
   timeSlot: {
     start: string;
@@ -30,7 +30,7 @@ export interface ReservationBody {
 }
 
 export interface IncidentBody {
-  spaceId: string;
-  reporterId: string;
+  spaceSlug: string;
+  dni: string;
   description: string;
 }

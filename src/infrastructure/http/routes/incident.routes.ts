@@ -7,6 +7,6 @@ export const createIncidentRoutes = (controller: IncidentController): Router => 
     const router: Router = Router();
     router.post('/incidents', controller.create);
     router.get('/incidents/:id', controller.getById);
-    router.get('/spaces/:id/incidents', controller.listBySpace);
+    router.get('/spaces/:slug/incidents', controller.listBySpace);
     return router;
 };

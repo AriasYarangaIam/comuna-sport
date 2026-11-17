@@ -36,6 +36,22 @@ export class PostgresSpaceRepository implements SpaceReader, SpaceWriter {
         return toSpace(row, windows.rows);
     }
 
+    // S1 (odd/tasks/privacy-identifiers-and-copy.md): the public identifier is
+    // the slug column maintained by db/migrations/004_spaces_slug.sql.
+    public async findBySlug(slug: string): Promise<Space | null> {
+        const spaces: QueryResult<SpaceRow> = await this.pool.query<SpaceRow>(
+            'SELECT * FROM spaces WHERE slug = $1',
+            [slug]
+        );
+        const row: SpaceRow | undefined = spaces.rows[0];
+        if (row === undefined) {
+            return null;
+        }
+
+        const windows: QueryResult<WindowRow> = await this.pool.query<WindowRow>(FIND_WINDOWS_SQL, [row.id]);
+        return toSpace(row, windows.rows);
+    }
+
     public async findAll(): Promise<Space[]> {
         const spaces: QueryResult<SpaceRow> = await this.pool.query<SpaceRow>(
             'SELECT * FROM spaces WHERE is_active ORDER BY name'

@@ -50,7 +50,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <ExplorePage /> },
       { path: 'disponibilidad', element: <AvailabilityPage /> },
-      { path: 'reservar/:spaceId', element: <ReservationPage /> },
+      { path: 'reservar/:spaceSlug', element: <ReservationPage /> },
       { path: 'recibo/:reservationId', element: <ReceiptPage /> },
       { path: 'mis-reservas', element: <MyReservationsPage /> },
       { path: 'incidentes', element: <IncidentsPage /> },

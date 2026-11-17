@@ -1,6 +1,7 @@
 /// <reference types="node" />
 /// <reference types="jest" />
 
+import { slugify } from "../../src/domain/services/slugify";
 import { randomUUID } from "crypto";
 
 import { buildContainer } from "../../src/infrastructure/di/container";
@@ -12,8 +13,7 @@ import type { Response as SuperTestResponse } from "supertest";
 
 interface ReservationBody {
     readonly id?: string;
-    readonly spaceId?: string;
-    readonly userId?: string;
+    readonly spaceSlug?: string;
     readonly role?: string;
     readonly timeSlot?: { readonly start: string; readonly end: string };
     readonly cost?: { readonly amount: number; readonly currency: string };
@@ -28,8 +28,7 @@ interface ReservationBody {
 
 interface IncidentBody {
     readonly id?: string;
-    readonly spaceId?: string;
-    readonly reporterId?: string;
+    readonly spaceSlug?: string;
     readonly description?: string;
     readonly state?: string;
     readonly createdAt?: string;
@@ -102,36 +101,40 @@ const slotOutside = (space: Space): { readonly start: string; readonly end: stri
     };
 };
 
+// S1/S2/S3: spaces are addressed by their public slug and the only citizen
+// identifier accepted is an 8-digit DNI (never echoed back).
 const postReservation = async (
-    spaceId: string,
+    spaceSlug: string,
     slot: { readonly start: string; readonly end: string },
     role: string,
     key?: string,
 ): Promise<SuperTestResponse> => {
     const base = request(app)
-        .post(`/spaces/${spaceId}/reservations`)
+        .post(`/spaces/${spaceSlug}/reservations`)
         .set('content-type', 'application/json');
     const req = key === undefined ? base : base.set('idempotency-key', key);
-    return req.send({ userId: 'user-e2e', role: role, timeSlot: slot });
+    return req.send({ dni: '12345678', role: role, timeSlot: slot });
 };
 
-const postIncident = async (spaceId: string): Promise<SuperTestResponse> => {
+const postIncident = async (spaceSlug: string): Promise<SuperTestResponse> => {
     return request(app)
         .post('/incidents')
         .set('content-type', 'application/json')
-        .send({ spaceId: spaceId, reporterId: 'user-e2e', description: 'Broken hoop' });
+        .send({ spaceSlug: spaceSlug, dni: '12345678', description: 'Broken hoop' });
 };
 
-describe('E2E — POST /spaces/:id/reservations', (): void => {
+describe('E2E — POST /spaces/:slug/reservations', (): void => {
     it('happy path → 201 with the full reservation DTO (NEIGHBOR ×1.0)', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores'); // base 100 PEN, window 8:00–22:00
-        const res = await postReservation(space.id.value, slotAt(space, 1), 'NEIGHBOR', randomUUID());
+        const res = await postReservation(slugify(space.name), slotAt(space, 1), 'NEIGHBOR', randomUUID());
         expect(res.status).toBe(201);
         const body = res.body as ReservationBody;
         expect(body.error).toBeUndefined();
         expect(body.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-        expect(body.spaceId).toBe(space.id.value);
-        expect(body.userId).toBe('user-e2e');
+        expect(body.spaceSlug).toBe(slugify(space.name));
+        expect(body).not.toHaveProperty('spaceId');
+        expect(body).not.toHaveProperty('userId');
+        expect(body).not.toHaveProperty('dni');
         expect(body.role).toBe('NEIGHBOR');
         expect(body.cost).toEqual({ amount: space.basePrice.amount, currency: 'PEN' });
         expect(body.isActive).toBe(true);
@@ -145,7 +148,7 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
 
     it('SENIOR pays ×0.5 → 201', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
-        const res = await postReservation(space.id.value, slotAt(space, 3), 'SENIOR', randomUUID());
+        const res = await postReservation(slugify(space.name), slotAt(space, 3), 'SENIOR', randomUUID());
         expect(res.status).toBe(201);
         const seniorCost = (res.body as ReservationBody).cost;
         if (seniorCost === undefined) {
@@ -156,7 +159,7 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
 
     it('PRIVATE_CLUB pays ×1.2 with half-up rounding → 201 (50.50 → 60.60)', async (): Promise<void> => {
         const space = await seedSpace('Pista Comunal Barranco'); // base 50.5 PEN
-        const res = await postReservation(space.id.value, slotAt(space, 1), 'PRIVATE_CLUB', randomUUID());
+        const res = await postReservation(slugify(space.name), slotAt(space, 1), 'PRIVATE_CLUB', randomUUID());
         expect(res.status).toBe(201);
         const body = res.body as ReservationBody;
         if (body.cost === undefined) {
@@ -168,21 +171,14 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
 
     it('missing Idempotency-Key → 400 MISSING_IDEMPOTENCY_KEY (APIError shape)', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
-        const res = await postReservation(space.id.value, slotAt(space, 5), 'NEIGHBOR');
+        const res = await postReservation(slugify(space.name), slotAt(space, 5), 'NEIGHBOR');
         expect(res.status).toBe(400);
         expect((res.body as ErrorBody).error.code).toBe('MISSING_IDEMPOTENCY_KEY');
         assertAPIErrorShape(res);
     });
 
-    it('malformed space id (not a UUID v4) → 400 BAD_REQUEST (APIError shape)', async (): Promise<void> => {
-        const res = await postReservation('not-a-uuid', slotAt(await seedSpace('Cancha de Veteranos Miraflores'), 7), 'NEIGHBOR', randomUUID());
-        expect(res.status).toBe(400);
-        expect((res.body as ErrorBody).error.code).toBe('BAD_REQUEST');
-        assertAPIErrorShape(res);
-    });
-
-    it('unknown space id → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
-        const res = await postReservation(randomUUID(), slotAt(await seedSpace('Cancha de Veteranos Miraflores'), 9), 'NEIGHBOR', randomUUID());
+    it('unknown space slug → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
+        const res = await postReservation('unknown-space-slug', slotAt(await seedSpace('Cancha de Veteranos Miraflores'), 9), 'NEIGHBOR', randomUUID());
         expect(res.status).toBe(404);
         expect((res.body as ErrorBody).error.code).toBe('SPACE_NOT_FOUND');
         assertAPIErrorShape(res);
@@ -190,7 +186,7 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
 
     it('slot outside availability → 400 BAD_REQUEST (APIError shape)', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
-        const res = await postReservation(space.id.value, slotOutside(space), 'NEIGHBOR', randomUUID());
+        const res = await postReservation(slugify(space.name), slotOutside(space), 'NEIGHBOR', randomUUID());
         expect(res.status).toBe(400);
         expect((res.body as ErrorBody).error.code).toBe('BAD_REQUEST');
         assertAPIErrorShape(res);
@@ -199,9 +195,9 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
     it('duplicate active reservation on the same slot → 409 RESERVATION_CONFLICT (APIError shape)', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
         const slot = slotAt(space, 11);
-        const first = await postReservation(space.id.value, slot, 'NEIGHBOR', randomUUID());
+        const first = await postReservation(slugify(space.name), slot, 'NEIGHBOR', randomUUID());
         expect(first.status).toBe(201);
-        const second = await postReservation(space.id.value, slot, 'NEIGHBOR', randomUUID());
+        const second = await postReservation(slugify(space.name), slot, 'NEIGHBOR', randomUUID());
         expect(second.status).toBe(409);
         expect((second.body as ErrorBody).error.code).toBe('RESERVATION_CONFLICT');
         assertAPIErrorShape(second);
@@ -209,7 +205,7 @@ describe('E2E — POST /spaces/:id/reservations', (): void => {
 
     it('invalid role → 400 BAD_REQUEST (APIError shape)', async (): Promise<void> => {
         const space = await seedSpace('Cancha de Veteranos Miraflores');
-        const res = await postReservation(space.id.value, slotAt(space, 13), 'ADMIN', randomUUID());
+        const res = await postReservation(slugify(space.name), slotAt(space, 13), 'ADMIN', randomUUID());
         expect(res.status).toBe(400);
         expect((res.body as ErrorBody).error.code).toBe('BAD_REQUEST');
         assertAPIErrorShape(res);
@@ -222,15 +218,15 @@ describe('E2E — idempotency end-to-end (D4)', (): void => {
         const slot = slotAt(space, 1);
         const key: string = randomUUID();
 
-        const first = await postReservation(space.id.value, slot, 'NEIGHBOR', key);
+        const first = await postReservation(slugify(space.name), slot, 'NEIGHBOR', key);
         expect(first.status).toBe(201);
         const firstBody = first.body as ReservationBody;
 
-        const replay = await postReservation(space.id.value, slot, 'NEIGHBOR', key);
+        const replay = await postReservation(slugify(space.name), slot, 'NEIGHBOR', key);
         expect(replay.status).toBe(201);
         expect((replay.body as ReservationBody).id).toBe(firstBody.id); // SAME reservation, replayed
 
-        const mismatch = await postReservation(space.id.value, slot, 'SENIOR', key);
+        const mismatch = await postReservation(slugify(space.name), slot, 'SENIOR', key);
         expect(mismatch.status).toBe(422);
         const errBody = mismatch.body as ErrorBody;
         expect(errBody.error.code).toBe('IDEMPOTENCY_CONFLICT');
@@ -243,13 +239,15 @@ describe('E2E — idempotency end-to-end (D4)', (): void => {
 describe('E2E — POST /incidents', (): void => {
     it('happy path → 201 with UNDER_REVIEW and resolvedAt null', async (): Promise<void> => {
         const space = await seedSpace('Losas Comunitarias Barranco');
-        const res = await postIncident(space.id.value);
+        const res = await postIncident(slugify(space.name));
         expect(res.status).toBe(201);
         const body = res.body as IncidentBody;
         expect(body.error).toBeUndefined();
         expect(body.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-        expect(body.spaceId).toBe(space.id.value);
-        expect(body.reporterId).toBe('user-e2e');
+        expect(body.spaceSlug).toBe(slugify(space.name));
+        expect(body).not.toHaveProperty('spaceId');
+        expect(body).not.toHaveProperty('reporterId');
+        expect(body).not.toHaveProperty('dni');
         expect(body.description).toBe('Broken hoop');
         expect(body.state).toBe('UNDER_REVIEW');
         expect(body.resolvedAt).toBeNull();
@@ -257,7 +255,7 @@ describe('E2E — POST /incidents', (): void => {
     });
 
     it('unknown space id → 404 SPACE_NOT_FOUND (APIError shape)', async (): Promise<void> => {
-        const res = await postIncident(randomUUID());
+        const res = await postIncident('unknown-space-slug');
         expect(res.status).toBe(404);
         expect((res.body as ErrorBody).error.code).toBe('SPACE_NOT_FOUND');
         assertAPIErrorShape(res);
@@ -267,7 +265,7 @@ describe('E2E — POST /incidents', (): void => {
         const space = await seedSpace('Multiusos San Isidro');
         space.deactivate();
         await container.resolve<InMemorySpaceRepository>('spaceRepository').save(space);
-        const res = await postIncident(space.id.value);
+        const res = await postIncident(slugify(space.name));
         expect(res.status).toBe(400);
         const errBody = res.body as ErrorBody;
         expect(errBody.error.code).toBe('BAD_REQUEST');

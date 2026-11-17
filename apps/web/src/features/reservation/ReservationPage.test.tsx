@@ -10,25 +10,25 @@ import { renderWithProviders } from '../../test/render';
 import { captured, server } from '../../test/server';
 import { ReservationPage } from './ReservationPage';
 
-const SPACE_ID = 'space-futbol-1';
+const SPACE_SLUG = 'cancha-central';
 
 const renderReservation = () =>
   renderWithProviders(
     <Routes>
-      <Route path="/reservar/:spaceId" element={<ReservationPage />} />
+      <Route path="/reservar/:spaceSlug" element={<ReservationPage />} />
       <Route path="/recibo/:reservationId" element={<h1>Recibo emitido</h1>} />
       <Route path="/" element={<h1>Explorador</h1>} />
     </Routes>,
-    { route: `/reservar/${SPACE_ID}` },
+    { route: `/reservar/${SPACE_SLUG}` },
   );
 
 const recordRequest = async (
   request: Request,
-  spaceId: string,
+  spaceSlug: string,
 ): Promise<ReservationBody> => {
   const body = (await request.json()) as ReservationBody;
   captured.reservationRequests.push({
-    spaceId,
+    spaceSlug,
     idempotencyKey: request.headers.get('Idempotency-Key'),
     body,
   });
@@ -38,16 +38,16 @@ const recordRequest = async (
 const reservationHandler = (
   respond: (body: ReservationBody) => Response | Promise<Response>,
 ) =>
-  http.post('*/api/spaces/:spaceId/reservations', async ({ params, request }) => {
-    const body = await recordRequest(request, String(params.spaceId));
+  http.post('*/api/spaces/:spaceSlug/reservations', async ({ params, request }) => {
+    const body = await recordRequest(request, String(params.spaceSlug));
     return respond(body);
   });
 
 const goToSummary = async (): Promise<void> => {
   await screen.findByRole('heading', { name: /Reservar · Cancha Central/ });
   await userEvent.type(
-    screen.getByLabelText(/ID de usuario o DNI/),
-    'user-vecino-4589',
+    screen.getByLabelText(/^DNI/),
+    '12345678',
   );
   await userEvent.click(screen.getByRole('button', { name: /Continuar/ }));
   await screen.findByRole('heading', { name: 'Categoría comunitaria' });
@@ -77,15 +77,15 @@ describe('ReservationPage (S3)', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /Continuar/ }));
     expect(
-      await screen.findByText('Ingresa tu identificador o DNI.'),
+      await screen.findByText('Ingresa tu DNI.'),
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText(/ID de usuario o DNI/),
+      screen.getByLabelText(/^DNI/),
     ).toHaveAttribute('aria-invalid', 'true');
 
     await userEvent.type(
-      screen.getByLabelText(/ID de usuario o DNI/),
-      'user-vecino-4589',
+      screen.getByLabelText(/^DNI/),
+      '12345678',
     );
     await userEvent.click(screen.getByRole('button', { name: /Continuar/ }));
     expect(
@@ -114,8 +114,8 @@ describe('ReservationPage (S3)', () => {
     await screen.findByRole('heading', { name: 'Recibo emitido' });
     expect(captured.reservationRequests).toHaveLength(1);
     const request = captured.reservationRequests[0];
-    expect(request?.spaceId).toBe(SPACE_ID);
-    expect(request?.body.userId).toBe('user-vecino-4589');
+    expect(request?.spaceSlug).toBe(SPACE_SLUG);
+    expect(request?.body.dni).toBe('12345678');
     expect(request?.body.role).toBe('NEIGHBOR');
     expect(request?.body.timeSlot.start).toMatch(
       /^\d{4}-\d{2}-\d{2}T\d{2}:00:00\.000Z$/,
@@ -129,9 +129,9 @@ describe('ReservationPage (S3)', () => {
     // Solo el primer POST falla; el segundo usa el handler por defecto.
     server.use(
       http.post(
-        '*/api/spaces/:spaceId/reservations',
+        '*/api/spaces/:spaceSlug/reservations',
         async ({ params, request }) => {
-          await recordRequest(request, String(params.spaceId));
+          await recordRequest(request, String(params.spaceSlug));
           return HttpResponse.error();
         },
         { once: true },
@@ -159,9 +159,9 @@ describe('ReservationPage (S3)', () => {
   it('rota la Idempotency-Key tras un payload_mismatch', async () => {
     server.use(
       http.post(
-        '*/api/spaces/:spaceId/reservations',
+        '*/api/spaces/:spaceSlug/reservations',
         async ({ params, request }) => {
-          await recordRequest(request, String(params.spaceId));
+          await recordRequest(request, String(params.spaceSlug));
           return HttpResponse.json(
             {
               error: {
@@ -219,7 +219,7 @@ describe('ReservationPage (S3)', () => {
   it('ofrece alternativas cuando el horario ya fue tomado', async () => {
     server.use(
       http.post(
-        '*/api/spaces/:spaceId/reservations',
+        '*/api/spaces/:spaceSlug/reservations',
         () =>
           HttpResponse.json(
             {

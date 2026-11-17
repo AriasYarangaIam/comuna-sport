@@ -60,7 +60,7 @@ describe('ExplorePage (S1)', () => {
       http.get('*/api/spaces', () =>
         HttpResponse.json([
           {
-            id: 'space-futbol-1',
+            slug: 'cancha-central',
             name: 'Cancha Central',
             type: 'CANCHA_FUTBOL',
             capacity: 22,

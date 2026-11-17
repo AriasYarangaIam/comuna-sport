@@ -94,7 +94,8 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
 ## Deployed behaviour worth knowing
 
 - **CORS is restricted in production.** `CORS_ALLOWED_ORIGINS` is set on the `comuna-sport-api`
-  project to the SPA's production origin, so that origin — and only it — receives
+  project to the two production origins of the SPA (`https://web-rust-iota-ncqbfyebew.vercel.app`
+  and `https://comuna-sport.vercel.app`), so those origins — and only they — receive
   `Access-Control-Allow-Origin`; any other origin gets the response without the header. A fresh clone
   or a deployment without the variable keeps the open demo default (`cors()` defaults, `*`).
 
@@ -103,8 +104,8 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
   ```
 
   ```bash
-  pnpm dlx vercel@latest env add CORS_ALLOWED_ORIGINS production
-  # value: https://web-rust-iota-ncqbfyebew.vercel.app
+  pnpm dlx vercel@latest env update CORS_ALLOWED_ORIGINS production --yes
+  # value: https://web-rust-iota-ncqbfyebew.vercel.app,https://comuna-sport.vercel.app
   pnpm dlx vercel@latest --prod --yes
   ```
 
@@ -114,6 +115,9 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
   **Preview deployments:** because the allowlist is exact, a SPA preview (`web-git-<branch>-*.vercel.app`,
   `web-<hash>-*.vercel.app`) is blocked by CORS when it calls the production API. Add that origin to
   the variable, or point the preview at its own API, before demoing from a preview URL.
+  The same applies to per-deployment URLs (`web-<id>-*.vercel.app`): they are also protected by
+  Vercel Deployment Protection (SSO redirect), so always open a SPA through one of the two
+  production origins above.
 - **`trust proxy` is one hop** (`TRUST_PROXY_HOPS` in `src/infrastructure/config/runtime.ts`), so the
   forwarded client address is the rate-limit key instead of the platform edge.
 - **Availability is informative.** `GET /spaces/availability` answers which spaces have the slot

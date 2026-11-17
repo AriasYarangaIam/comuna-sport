@@ -26,9 +26,9 @@ export function SpaceCard({
   const type = SPACE_TYPE_META[space.type];
   const TypeIcon = type.icon;
   const disabled = !space.isActive;
-  const reserveTo = reserveHref ?? `/disponibilidad?spaceId=${encodeURIComponent(space.id)}`;
+  const reserveTo = reserveHref ?? `/disponibilidad?spaceSlug=${encodeURIComponent(space.slug)}`;
   const reportTo =
-    reportHref ?? `/incidentes?spaceId=${encodeURIComponent(space.id)}`;
+    reportHref ?? `/incidentes?spaceSlug=${encodeURIComponent(space.slug)}`;
   const disabledReason = 'Este espacio está fuera de servicio temporalmente.';
 
   return (
@@ -40,7 +40,7 @@ export function SpaceCard({
           : 'border-border hover:shadow-raised',
         className,
       )}
-      aria-labelledby={`space-${space.id}-title`}
+      aria-labelledby={`space-${space.slug}-title`}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <Badge tone="info" icon={TypeIcon}>
@@ -50,7 +50,7 @@ export function SpaceCard({
       </div>
 
       <h3
-        id={`space-${space.id}-title`}
+        id={`space-${space.slug}-title`}
         className={cn(
           'mt-3 text-headline-sm text-ink',
           disabled && 'text-ink-soft',

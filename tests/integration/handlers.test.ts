@@ -1,7 +1,6 @@
 /// <reference types="node" />
 /// <reference types="jest" />
 
-import { randomUUID } from "crypto";
 
 import { buildContainer } from "../../src/infrastructure/di/container";
 import type { CreateIncidentCommand } from "../../src/application/commands/create-incident.command";
@@ -20,6 +19,7 @@ import type { LocalEventBus } from "../../src/infrastructure/event-bus/local-eve
 import type { InMemoryIncidentRepository } from "../../src/infrastructure/persistence/in-memory/incident.in-memory.repository";
 import type { InMemoryReservationRepository } from "../../src/infrastructure/persistence/in-memory/reservation.in-memory.repository";
 import type { InMemorySpaceRepository } from "../../src/infrastructure/persistence/in-memory/space.in-memory.repository";
+import { slugify } from "../../src/domain/services/slugify";
 import { ReservationId } from "../../src/domain/value-objects/reservation-id.vo";
 import { IncidentId } from "../../src/domain/value-objects/incident-id.vo";
 
@@ -88,24 +88,26 @@ const slotBeforeOpen = (space: Space): SlotBody => {
     };
 };
 
+const VALID_DNI = '12345678';
+
 const reservationCommand = (
     space: Space,
     slot: SlotBody,
     role: 'NEIGHBOR' | 'YOUTH' | 'SENIOR' | 'PRIVATE_CLUB' = 'NEIGHBOR',
-    userId: string = 'user-1',
-    spaceIdOverride?: string
+    dni: string = VALID_DNI,
+    slugOverride?: string
 ): CreateReservationCommand => ({
     type: 'CREATE_RESERVATION',
-    spaceId: spaceIdOverride === undefined ? space.id.value : spaceIdOverride,
-    userId: userId,
+    spaceSlug: slugOverride === undefined ? slugify(space.name) : slugOverride,
+    dni: dni,
     role: role,
     timeSlot: slot,
 });
 
-const incidentCommand = (space: Space, spaceIdOverride?: string): CreateIncidentCommand => ({
+const incidentCommand = (space: Space, slugOverride?: string): CreateIncidentCommand => ({
     type: 'CREATE_INCIDENT',
-    spaceId: spaceIdOverride === undefined ? space.id.value : spaceIdOverride,
-    reporterId: 'user-1',
+    spaceSlug: slugOverride === undefined ? slugify(space.name) : slugOverride,
+    dni: VALID_DNI,
     description: 'Broken hoop',
 });
 
@@ -117,8 +119,10 @@ describe('CreateReservationHandler — full command flow with real dependencies'
             reservationCommand(f.seeded, slot)
         );
         expect(dto.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-        expect(dto.spaceId).toBe(f.seeded.id.value);
-        expect(dto.userId).toBe('user-1');
+        expect(dto.spaceSlug).toBe(slugify(f.seeded.name));
+        expect(dto).not.toHaveProperty('spaceId');
+        expect(dto).not.toHaveProperty('userId');
+        expect(dto).not.toHaveProperty('dni');
         expect(dto.role).toBe('NEIGHBOR');
         // Seeded space #1 has base price 100 PEN; NEIGHBOR multiplies ×1.0.
         expect(dto.cost).toEqual({ amount: f.seeded.basePrice.amount, currency: 'PEN' });
@@ -130,6 +134,8 @@ describe('CreateReservationHandler — full command flow with real dependencies'
         const saved = await f.reservations.findById(ReservationId.create(dto.id));
         expect(saved).not.toBeNull();
         expect(saved?.isActive).toBe(true);
+        // S2/S4: the DNI is stored as the internal user key and never echoed.
+        expect(saved?.userId).toBe(VALID_DNI);
     });
 
     it('success: SENIOR pays half the base price through the factory', async (): Promise<void> => {
@@ -145,7 +151,7 @@ describe('CreateReservationHandler — full command flow with real dependencies'
     it('unknown space id → EntityNotFoundException (SPACE_NOT_FOUND)', async (): Promise<void> => {
         const f = await buildFixture();
         const space: Space = f.seeded;
-        const command: CreateReservationCommand = reservationCommand(space, slotInside(space), undefined, undefined, randomUUID()); // valid UUID v4, but not seeded
+        const command: CreateReservationCommand = reservationCommand(space, slotInside(space), undefined, undefined, 'unknown-space-slug'); // valid slug shape, but not seeded
         await expect(f.commandBus.execute<ReservationResponseDto>(command)).rejects.toThrow(EntityNotFoundException);
         await expect(f.commandBus.execute<ReservationResponseDto>(command)).rejects.toMatchObject({ code: 'SPACE_NOT_FOUND' });
     });
@@ -191,11 +197,13 @@ describe('CreateReservationHandler — full command flow with real dependencies'
         saved.cancel();
         await f.reservations.save(saved);
         const second: ReservationResponseDto = await f.commandBus.execute<ReservationResponseDto>(
-            reservationCommand(f.seeded, slot, 'NEIGHBOR', 'user-2')
+            reservationCommand(f.seeded, slot, 'NEIGHBOR', '87654321')
         );
         expect(second.id).not.toBe(first.id);
         expect(second.isActive).toBe(true);
-        expect(second.userId).toBe('user-2');
+        expect(second).not.toHaveProperty('userId');
+        const savedSecond = await f.reservations.findById(ReservationId.create(second.id));
+        expect(savedSecond?.userId).toBe('87654321');
     });
 
     it('publishes ReservationConfirmedEvent exactly once, only AFTER the save', async (): Promise<void> => {
@@ -219,8 +227,8 @@ describe('CreateReservationHandler — full command flow with real dependencies'
         expect(only.savedAtPublish).toBe(true); // persisted BEFORE the event fired
         expect(only.event.type).toBe('ReservationConfirmed');
         expect(only.event.reservationId.value).toBe(dto.id);
-        expect(only.event.spaceId.value).toBe(dto.spaceId);
-        expect(only.event.userId).toBe(dto.userId);
+        expect(only.event.spaceId.value).toBe(f.seeded.id.value);
+        expect(only.event.userId).toBe(VALID_DNI);
         expect(only.event.cost).toEqual(dto.cost);
         expect(only.event.timeSlot.start.toISOString()).toBe(dto.timeSlot.start);
         // The handler returned AFTER the event (save → publish → return).
@@ -233,20 +241,23 @@ describe('CreateIncidentHandler — incident command flow', (): void => {
         const f = await buildFixture();
         const dto: IncidentResponseDto = await f.commandBus.execute<IncidentResponseDto>(incidentCommand(f.seeded));
         expect(dto.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-        expect(dto.spaceId).toBe(f.seeded.id.value);
-        expect(dto.reporterId).toBe('user-1');
+        expect(dto.spaceSlug).toBe(slugify(f.seeded.name));
+        expect(dto).not.toHaveProperty('spaceId');
+        expect(dto).not.toHaveProperty('reporterId');
+        expect(dto).not.toHaveProperty('dni');
         expect(dto.description).toBe('Broken hoop');
         expect(dto.state).toBe('UNDER_REVIEW');
         expect(dto.resolvedAt).toBeNull();
         expect(dto.createdAt).not.toBe('');
         const saved = await f.incidents.findById(IncidentId.create(dto.id));
         expect(saved).not.toBeNull();
+        expect(saved?.reporterId).toBe(VALID_DNI);
     });
 
     it('unknown space id → EntityNotFoundException (SPACE_NOT_FOUND)', async (): Promise<void> => {
         const f = await buildFixture();
         const space: Space = f.seeded;
-        const command: CreateIncidentCommand = incidentCommand(space, randomUUID()); // valid UUID v4, but not seeded
+        const command: CreateIncidentCommand = incidentCommand(space, 'unknown-space-slug'); // valid slug shape, but not seeded
         await expect(f.commandBus.execute<IncidentResponseDto>(command)).rejects.toThrow(EntityNotFoundException);
         await expect(f.commandBus.execute<IncidentResponseDto>(command)).rejects.toMatchObject({ code: 'SPACE_NOT_FOUND' });
     });
