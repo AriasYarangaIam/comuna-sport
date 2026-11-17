@@ -6,7 +6,7 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
     page,
   }) => {
     const api = await installApiMock(page);
-    await page.goto('/reservar/space-futbol-1');
+    await page.goto('/reservar/cancha-central');
 
     await expect(
       page.getByRole('heading', { name: /Reservar · Cancha Central/ }),
@@ -19,7 +19,7 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
     );
     expect(overflow).toBe(false);
 
-    await page.getByLabel(/ID de usuario o DNI/).fill('user-vecino-4589');
+    await page.getByLabel(/^DNI/).fill('12345678');
     await page.getByRole('button', { name: /Continuar/ }).click();
     await expect(
       page.getByRole('heading', { name: 'Categoría comunitaria' }),
@@ -44,18 +44,18 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
 
   test('permite operar el asistente solo con teclado', async ({ page }) => {
     await installApiMock(page);
-    await page.goto('/reservar/space-futbol-1');
+    await page.goto('/reservar/cancha-central');
 
     const submit = page.getByRole('button', { name: /Continuar/ });
     await submit.focus();
     await page.keyboard.press('Enter');
 
     // El foco se mueve al primer campo inválido.
-    const userId = page.getByLabel(/ID de usuario o DNI/);
-    await expect(page.getByText('Ingresa tu identificador o DNI.')).toBeVisible();
-    await expect(userId).toBeFocused();
+    const dniField = page.getByLabel(/^DNI/);
+    await expect(page.getByText('Ingresa tu DNI.')).toBeVisible();
+    await expect(dniField).toBeFocused();
 
-    await userId.fill('user-teclado-1');
+    await dniField.fill('12345678');
     await page.keyboard.press('Enter');
     await expect(
       page.getByRole('heading', { name: 'Categoría comunitaria' }),
@@ -70,9 +70,9 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
 
   test('un doble toque no duplica la reserva', async ({ page }) => {
     const api = await installApiMock(page);
-    await page.goto('/reservar/space-futbol-1');
+    await page.goto('/reservar/cancha-central');
 
-    await page.getByLabel(/ID de usuario o DNI/).fill('user-vecino-4589');
+    await page.getByLabel(/^DNI/).fill('12345678');
     await page.getByRole('button', { name: /Continuar/ }).click();
     await page.getByRole('button', { name: /Continuar/ }).click();
 
@@ -91,7 +91,7 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
     page,
   }) => {
     await installApiMock(page);
-    await page.route('**/api/spaces/space-futbol-1', (route) =>
+    await page.route('**/api/spaces/cancha-central', (route) =>
       route.fulfill({
         status: 500,
         contentType: 'application/json',
@@ -101,7 +101,7 @@ test.describe('Reserva de un espacio (S3 → S4)', () => {
       }),
     );
 
-    await page.goto('/reservar/space-futbol-1');
+    await page.goto('/reservar/cancha-central');
 
     await expect(page.getByText('Algo falló de nuestro lado')).toBeVisible();
     await expect(page.getByText('Internal failure')).toHaveCount(0);

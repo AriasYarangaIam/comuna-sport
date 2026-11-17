@@ -87,7 +87,7 @@ const startOptionsFor = (
 
 export function AvailabilityPage() {
   const [searchParams] = useSearchParams();
-  const spaceId = searchParams.get('spaceId') ?? '';
+  const spaceSlug = searchParams.get('spaceSlug') ?? '';
   const {
     data: spaces,
     isPending: spacesPending,
@@ -98,8 +98,8 @@ export function AvailabilityPage() {
   } = useSpaces();
 
   const selectedSpace = useMemo(
-    () => (spaces ?? []).find((space) => space.id === spaceId),
-    [spaces, spaceId],
+    () => (spaces ?? []).find((space) => space.slug === spaceSlug),
+    [spaces, spaceSlug],
   );
 
   const initialisedFor = useRef<string | null>(null);
@@ -111,7 +111,7 @@ export function AvailabilityPage() {
     if (spacesPending) {
       return;
     }
-    const key = spaceId === '' ? '__all__' : spaceId;
+    const key = spaceSlug === '' ? '__all__' : spaceSlug;
     if (initialisedFor.current === key) {
       return;
     }
@@ -120,7 +120,7 @@ export function AvailabilityPage() {
     setStartTime(suggestion.startTime);
     setDuration(2);
     initialisedFor.current = key;
-  }, [spaceId, spacesPending, selectedSpace]);
+  }, [spaceSlug, spacesPending, selectedSpace]);
 
   const startOptions = startOptionsFor(selectedSpace, dateKey, duration);
 
@@ -192,21 +192,25 @@ export function AvailabilityPage() {
 
   const freeSpaces = availableSpaces ?? [];
   const selectedIsFree =
-    spaceId === '' ? true : freeSpaces.some((space) => space.id === spaceId);
+    spaceSlug === ''
+      ? true
+      : freeSpaces.some((space) => space.slug === spaceSlug);
   const alternatives =
-    spaceId === '' ? freeSpaces : freeSpaces.filter((space) => space.id !== spaceId);
+    spaceSlug === ''
+      ? freeSpaces
+      : freeSpaces.filter((space) => space.slug !== spaceSlug);
   const visibleSpaces =
-    spaceId === '' ? freeSpaces : selectedIsFree ? [selectedSpace].filter((s): s is SpaceDto => s !== undefined) : alternatives;
+    spaceSlug === '' ? freeSpaces : selectedIsFree ? [selectedSpace].filter((s): s is SpaceDto => s !== undefined) : alternatives;
 
-  const reserveHref = (spaceIdValue: string): string => {
+  const reserveHref = (spaceSlugValue: string): string => {
     if (band === null) {
-      return `/reservar/${spaceIdValue}`;
+      return `/reservar/${spaceSlugValue}`;
     }
     const params = new URLSearchParams({
       start: band.start,
       end: band.end,
     });
-    return `/reservar/${spaceIdValue}?${params.toString()}`;
+    return `/reservar/${spaceSlugValue}?${params.toString()}`;
   };
 
   return (
@@ -405,7 +409,7 @@ export function AvailabilityPage() {
             />
           ) : availabilityPending ? (
             <SpaceGridSkeleton count={2} />
-          ) : spaceId !== '' && !selectedIsFree ? (
+          ) : spaceSlug !== '' && !selectedIsFree ? (
             <div className="space-y-4">
               <InlineAlert tone="warning" title="Ese espacio no está libre en ese bloque">
                 Otro vecino ya reservó esta franja. Puedes elegir otro horario o
@@ -434,9 +438,9 @@ export function AvailabilityPage() {
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {alternatives.map((space) => (
                     <SpaceCard
-                      key={space.id}
+                      key={space.slug}
                       space={space}
-                      reserveHref={reserveHref(space.id)}
+                      reserveHref={reserveHref(space.slug)}
                       ctaLabel="Reservar este bloque"
                     />
                   ))}
@@ -464,9 +468,9 @@ export function AvailabilityPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {visibleSpaces.map((space) => (
                 <SpaceCard
-                  key={space.id}
+                  key={space.slug}
                   space={space}
-                  reserveHref={reserveHref(space.id)}
+                  reserveHref={reserveHref(space.slug)}
                   ctaLabel="Reservar este bloque"
                 />
               ))}

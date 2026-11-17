@@ -27,10 +27,10 @@ describe('SpaceCard', () => {
     renderCard();
     expect(
       screen.getByRole('link', { name: /Ver horarios y reservar/ }),
-    ).toHaveAttribute('href', '/disponibilidad?spaceId=space-futbol-1');
+    ).toHaveAttribute('href', '/disponibilidad?spaceSlug=cancha-central');
     expect(
       screen.getByRole('link', { name: /Reportar un daño/ }),
-    ).toHaveAttribute('href', '/incidentes?spaceId=space-futbol-1');
+    ).toHaveAttribute('href', '/incidentes?spaceSlug=cancha-central');
   });
 
   it('bloquea la reserva cuando el espacio está inactivo', () => {

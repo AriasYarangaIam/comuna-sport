@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarX,
-  Info,
   RefreshCw,
   ShieldCheck,
   Wrench,
@@ -34,7 +33,7 @@ import {
   toUserFacingError,
   type UserFacingError,
 } from '../../lib/errors';
-import { createIdempotencyKey, shortIdempotencyKey } from '../../lib/idempotency';
+import { createIdempotencyKey } from '../../lib/idempotency';
 import { ApiError } from '../../lib/api';
 import { useUiStore } from '../../stores/ui';
 import { cn } from '../../lib/cn';
@@ -53,18 +52,18 @@ import { SpaceStatusBadge } from '../../components/domain/StatusBadge';
 const STEPS = ['Identificación', 'Categoría', 'Horario y tarifa'] as const;
 
 interface ReservationErrors {
-  userId?: string;
+  dni?: string;
   date?: string;
   start?: string;
   end?: string;
 }
 
 export function ReservationPage() {
-  const { spaceId = '' } = useParams<{ spaceId: string }>();
+  const { spaceSlug = '' } = useParams<{ spaceSlug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const lastUserId = useUiStore((state) => state.lastUserId);
-  const setLastUserId = useUiStore((state) => state.setLastUserId);
+  const lastDni = useUiStore((state) => state.lastDni);
+  const setLastDni = useUiStore((state) => state.setLastDni);
 
   const {
     data: space,
@@ -73,10 +72,10 @@ export function ReservationPage() {
     error: spaceErrorObject,
     refetch: refetchSpace,
     isFetching: spaceFetching,
-  } = useSpace(spaceId);
+  } = useSpace(spaceSlug);
 
   const [step, setStep] = useState(0);
-  const [userId, setUserId] = useState(lastUserId);
+  const [dni, setDni] = useState(lastDni);
   const [role, setRole] = useState<UserRoleType>('NEIGHBOR');
   const [dateKey, setDateKey] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -99,7 +98,7 @@ export function ReservationPage() {
     if (space === undefined || spacePending) {
       return;
     }
-    const key = `${spaceId}|${startParam ?? ''}|${endParam ?? ''}`;
+    const key = `${spaceSlug}|${startParam ?? ''}|${endParam ?? ''}`;
     if (initialisedFor.current === key) {
       return;
     }
@@ -119,7 +118,7 @@ export function ReservationPage() {
     setStartTime(suggestion.startTime);
     setEndTime(suggestion.endTime);
     initialisedFor.current = key;
-  }, [space, spacePending, spaceId, startParam, endParam]);
+  }, [space, spacePending, spaceSlug, startParam, endParam]);
 
   const startIso =
     dateKey !== '' && startTime !== '' ? toLimaIso(dateKey, startTime) : '';
@@ -129,7 +128,7 @@ export function ReservationPage() {
   // Ciclo de la llave: rota solo cuando cambian identidad, rol o franja.
   useEffect(() => {
     setIdempotencyKey(createIdempotencyKey());
-  }, [userId, role, startIso, endIso]);
+  }, [dni, role, startIso, endIso]);
 
   useEffect(() => {
     if (step > 0) {
@@ -155,14 +154,16 @@ export function ReservationPage() {
   );
 
   const conflictAlternatives = (alternatives ?? []).filter(
-    (candidate) => candidate.id !== spaceId,
+    (candidate) => candidate.slug !== spaceSlug,
   );
 
   const validate = (targetStep: number): boolean => {
     const nextErrors: ReservationErrors = {};
 
-    if (targetStep === 0 && userId.trim() === '') {
-      nextErrors.userId = 'Ingresa tu identificador o DNI.';
+    if (targetStep === 0 && dni.trim() === '') {
+      nextErrors.dni = 'Ingresa tu DNI.';
+    } else if (targetStep === 0 && !/^\d{8}$/.test(dni.trim())) {
+      nextErrors.dni = 'El DNI debe tener exactamente 8 dígitos.';
     }
 
     if (targetStep === 2) {
@@ -243,13 +244,13 @@ export function ReservationPage() {
     }
     submittingRef.current = true;
     setSubmitError(null);
-    setLastUserId(userId.trim());
+    setLastDni(dni.trim());
     mutation.mutate(
       {
-        spaceId: space.id,
+        spaceSlug: space.slug,
         idempotencyKey,
         body: {
-          userId: userId.trim(),
+          dni: dni.trim(),
           role,
           timeSlot: { start: startIso, end: endIso },
         },
@@ -426,30 +427,30 @@ export function ReservationPage() {
                   Identifícate para tu reserva
                 </h2>
                 <p className="mt-1 text-small text-ink-soft">
-                  Usamos tu identificador para vincular el comprobante. No
-                  creamos una cuenta ni pedimos contraseña.
+                  Usamos tu DNI para identificar la reserva. No creamos una
+                  cuenta ni pedimos contraseña.
                 </p>
                 <div className="mt-4 max-w-md">
                   <TextInput
-                    id="reservation-user-id"
-                    label="ID de usuario o DNI"
-                    value={userId}
+                    id="reservation-dni"
+                    label="DNI"
+                    value={dni}
                     onChange={(event) => {
-                      setUserId(event.target.value);
-                      setErrors((current) => ({ ...current, userId: undefined }));
+                      setDni(event.target.value);
+                      setErrors((current) => ({ ...current, dni: undefined }));
                     }}
-                    placeholder="user-vecino-4589"
-                    hint="No es una cuenta: identifica tu reserva en el comprobante."
-                    error={errors.userId}
-                    autoComplete="username"
+                    placeholder="12345678"
+                    hint="Ocho dígitos, sin puntos ni espacios."
+                    error={errors.dni}
+                    autoComplete="off"
                     required
                   />
                 </div>
                 <div className="mt-5 flex items-start gap-2 rounded-control border border-border bg-tint p-3 text-small text-ink-soft">
                   <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" aria-hidden="true" />
                   <p>
-                    La reserva queda a nombre del identificador que ingreses.
-                    Guárdalo para consultar el comprobante en “Mis reservas”.
+                    La reserva queda a nombre del DNI que ingreses. Guárdalo
+                    para consultar el comprobante en “Mis reservas”.
                   </p>
                 </div>
               </section>
@@ -529,10 +530,6 @@ export function ReservationPage() {
                   />
                 </div>
 
-                <p className="mt-4 text-caption text-ink-soft" data-reading-hide>
-                  Referencia de operación:{' '}
-                  <span className="font-mono">{shortIdempotencyKey(idempotencyKey)}</span>
-                </p>
               </section>
             ) : null}
 
@@ -638,15 +635,6 @@ export function ReservationPage() {
               />
             </div>
 
-            <p className="mt-4 text-caption text-ink-soft" data-reading-hide>
-              Referencia de operación:{' '}
-              <span className="font-mono">{shortIdempotencyKey(idempotencyKey)}</span>
-            </p>
-            <p className="mt-3 flex gap-2 text-caption text-ink-soft">
-              <Info className="h-4 w-4 shrink-0 text-sky-700" aria-hidden="true" />
-              Un reintento o doble toque reutiliza la misma referencia; el
-              servidor evita reservas duplicadas.
-            </p>
           </aside>
         </div>
       </div>
@@ -684,9 +672,9 @@ export function ReservationPage() {
         ) : (
           <ul className="space-y-2">
             {conflictAlternatives.map((candidate) => (
-              <li key={candidate.id}>
+              <li key={candidate.slug}>
                 <Link
-                  to={`/reservar/${candidate.id}?${new URLSearchParams({
+                  to={`/reservar/${candidate.slug}?${new URLSearchParams({
                     start: startIso,
                     end: endIso,
                   }).toString()}`}

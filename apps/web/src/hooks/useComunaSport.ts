@@ -14,14 +14,14 @@ import type {
 
 export const queryKeys = {
   spaces: ['spaces'] as const,
-  space: (spaceId: string) => ['spaces', spaceId] as const,
+  space: (spaceSlug: string) => ['spaces', spaceSlug] as const,
   availability: (start: string, end: string) =>
     ['spaces', 'availability', start, end] as const,
   reservation: (reservationId: string) =>
     ['reservations', reservationId] as const,
-  userReservations: (userId: string) =>
-    ['users', userId, 'reservations'] as const,
-  incidents: (spaceId: string) => ['spaces', spaceId, 'incidents'] as const,
+  userReservations: (dni: string) =>
+    ['users', dni, 'reservations'] as const,
+  incidents: (spaceSlug: string) => ['spaces', spaceSlug, 'incidents'] as const,
 };
 
 export const useSpaces = () =>
@@ -31,11 +31,11 @@ export const useSpaces = () =>
     staleTime: 5 * 60_000,
   });
 
-export const useSpace = (spaceId: string | undefined) =>
+export const useSpace = (spaceSlug: string | undefined) =>
   useQuery<SpaceDto>({
-    queryKey: queryKeys.space(spaceId ?? ''),
-    queryFn: ({ signal }) => api.getSpace(spaceId ?? '', signal),
-    enabled: spaceId !== undefined && spaceId !== '',
+    queryKey: queryKeys.space(spaceSlug ?? ''),
+    queryFn: ({ signal }) => api.getSpace(spaceSlug ?? '', signal),
+    enabled: spaceSlug !== undefined && spaceSlug !== '',
     staleTime: 5 * 60_000,
   });
 
@@ -63,24 +63,24 @@ export const useReservation = (reservationId: string | undefined) =>
     staleTime: 30_000,
   });
 
-export const useUserReservations = (userId: string) =>
+export const useUserReservations = (dni: string) =>
   useQuery<ReservationDto[]>({
-    queryKey: queryKeys.userReservations(userId),
-    queryFn: ({ signal }) => api.getUserReservations(userId, signal),
-    enabled: userId.trim() !== '',
+    queryKey: queryKeys.userReservations(dni),
+    queryFn: ({ signal }) => api.getUserReservations(dni, signal),
+    enabled: dni.trim() !== '',
     staleTime: 30_000,
   });
 
-export const useSpaceIncidents = (spaceId: string | undefined) =>
+export const useSpaceIncidents = (spaceSlug: string | undefined) =>
   useQuery<IncidentDto[]>({
-    queryKey: queryKeys.incidents(spaceId ?? ''),
-    queryFn: ({ signal }) => api.getSpaceIncidents(spaceId ?? '', signal),
-    enabled: spaceId !== undefined && spaceId !== '',
+    queryKey: queryKeys.incidents(spaceSlug ?? ''),
+    queryFn: ({ signal }) => api.getSpaceIncidents(spaceSlug ?? '', signal),
+    enabled: spaceSlug !== undefined && spaceSlug !== '',
     staleTime: 30_000,
   });
 
 export interface CreateReservationVariables {
-  spaceId: string;
+  spaceSlug: string;
   body: ReservationBody;
   idempotencyKey: string;
 }
@@ -88,12 +88,14 @@ export interface CreateReservationVariables {
 export const useCreateReservation = () => {
   const queryClient = useQueryClient();
   return useMutation<ReservationDto, unknown, CreateReservationVariables>({
-    mutationFn: ({ spaceId, body, idempotencyKey }) =>
-      api.createReservation(spaceId, body, idempotencyKey),
-    onSuccess: (reservation) => {
+    mutationFn: ({ spaceSlug, body, idempotencyKey }) =>
+      api.createReservation(spaceSlug, body, idempotencyKey),
+    onSuccess: (_reservation, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['spaces', 'availability'] });
+      // S4: the response carries no citizen identifier — the DNI comes from
+      // the request that was just accepted.
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.userReservations(reservation.userId),
+        queryKey: queryKeys.userReservations(variables.body.dni),
       });
     },
   });
@@ -105,11 +107,11 @@ export const useCreateIncident = () => {
     mutationFn: (body) => api.createIncident(body),
     onSuccess: (incident) => {
       queryClient.setQueryData<IncidentDto[]>(
-        queryKeys.incidents(incident.spaceId),
+        queryKeys.incidents(incident.spaceSlug),
         (current) => [incident, ...(current ?? [])],
       );
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.incidents(incident.spaceId),
+        queryKey: queryKeys.incidents(incident.spaceSlug),
       });
     },
   });

@@ -22,7 +22,7 @@ const dailyWindows = (days = 31): SpaceDto['availabilityWindows'] => {
 };
 
 export const makeSpace = (overrides: Partial<SpaceDto> = {}): SpaceDto => ({
-  id: 'space-futbol-1',
+  slug: 'cancha-central',
   name: 'Cancha Central',
   type: 'CANCHA_FUTBOL',
   capacity: 22,
@@ -35,14 +35,14 @@ export const makeSpace = (overrides: Partial<SpaceDto> = {}): SpaceDto => ({
 export const spacesFixture: SpaceDto[] = [
   makeSpace(),
   makeSpace({
-    id: 'space-basquet-1',
+    slug: 'losa-municipal',
     name: 'Losa Municipal',
     type: 'LOSA_BASQUET',
     capacity: 10,
     basePrice: { amount: 60, currency: 'PEN' },
   }),
   makeSpace({
-    id: 'space-tenis-1',
+    slug: 'pista-los-alamos',
     name: 'Pista Los Álamos',
     type: 'PISTA_TENIS',
     capacity: 4,
@@ -55,8 +55,7 @@ export const makeReservation = (
   overrides: Partial<ReservationDto> = {},
 ): ReservationDto => ({
   id: 'reservation-1',
-  spaceId: 'space-futbol-1',
-  userId: 'user-vecino-4589',
+  spaceSlug: 'cancha-central',
   role: 'NEIGHBOR',
   timeSlot: {
     start: fromLimaWallClock(todayLimaDateKey(), '10:00').toISOString(),
@@ -72,8 +71,7 @@ export const makeIncident = (
   overrides: Partial<IncidentDto> = {},
 ): IncidentDto => ({
   id: 'incident-1',
-  spaceId: 'space-futbol-1',
-  reporterId: 'user-vecino-4589',
+  spaceSlug: 'cancha-central',
   description: 'La malla del arco está rota.',
   state: 'UNDER_REVIEW',
   createdAt: fromLimaWallClock(todayLimaDateKey(), '08:30').toISOString(),

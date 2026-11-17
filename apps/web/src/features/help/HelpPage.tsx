@@ -88,10 +88,9 @@ export function HelpPage() {
             Accesibilidad
           </h2>
           <p className="mt-3 text-body text-ink-soft">
-            La barra superior incluye el interruptor “Lectura fácil”, que aumenta
-            el tamaño del texto y los objetivos táctiles. La navegación funciona
-            con teclado, los estados se anuncian a lectores de pantalla y se
-            respeta la preferencia de movimiento reducido del sistema.
+            La navegación funciona con teclado, los estados se anuncian a
+            lectores de pantalla y se respeta la preferencia de movimiento
+            reducido del sistema.
           </p>
         </section>
 

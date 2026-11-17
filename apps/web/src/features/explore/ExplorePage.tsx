@@ -186,7 +186,7 @@ export function ExplorePage() {
           {!isPending && errorCopy === null && filtered.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filtered.map((space) => (
-                <SpaceCard key={space.id} space={space} />
+                <SpaceCard key={space.slug} space={space} />
               ))}
             </div>
           ) : null}
@@ -229,9 +229,7 @@ function StatCard({
       <dd className="mt-1 text-headline-sm font-semibold tabular-nums text-ink">
         {value}
       </dd>
-      <dd className="mt-0.5 text-caption text-ink-soft" data-reading-hide>
-        {hint}
-      </dd>
+      <dd className="mt-0.5 text-caption text-ink-soft">{hint}</dd>
     </div>
   );
 }

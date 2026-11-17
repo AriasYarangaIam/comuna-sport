@@ -121,8 +121,8 @@ export const api = {
   getSpaces: (signal?: AbortSignal): Promise<SpaceDto[]> =>
     request('/spaces', spaceListSchema, { signal }),
 
-  getSpace: (spaceId: string, signal?: AbortSignal): Promise<SpaceDto> =>
-    request(`/spaces/${encodeURIComponent(spaceId)}`, spaceSchema, { signal }),
+  getSpace: (spaceSlug: string, signal?: AbortSignal): Promise<SpaceDto> =>
+    request(`/spaces/${encodeURIComponent(spaceSlug)}`, spaceSchema, { signal }),
 
   getAvailability: (
     start: string,
@@ -136,11 +136,11 @@ export const api = {
     ),
 
   createReservation: (
-    spaceId: string,
+    spaceSlug: string,
     body: ReservationBody,
     idempotencyKey: string,
   ): Promise<ReservationDto> =>
-    request(`/spaces/${encodeURIComponent(spaceId)}/reservations`, reservationSchema, {
+    request(`/spaces/${encodeURIComponent(spaceSlug)}/reservations`, reservationSchema, {
       method: 'POST',
       headers: { 'Idempotency-Key': idempotencyKey },
       body: JSON.stringify(body),
@@ -157,11 +157,11 @@ export const api = {
     ),
 
   getUserReservations: (
-    userId: string,
+    dni: string,
     signal?: AbortSignal,
   ): Promise<ReservationDto[]> =>
     request(
-      `/users/${encodeURIComponent(userId)}/reservations`,
+      `/users/${encodeURIComponent(dni)}/reservations`,
       reservationListSchema,
       { signal },
     ),
@@ -178,11 +178,11 @@ export const api = {
     }),
 
   getSpaceIncidents: (
-    spaceId: string,
+    spaceSlug: string,
     signal?: AbortSignal,
   ): Promise<IncidentDto[]> =>
     request(
-      `/spaces/${encodeURIComponent(spaceId)}/incidents`,
+      `/spaces/${encodeURIComponent(spaceSlug)}/incidents`,
       incidentListSchema,
       { signal },
     ),

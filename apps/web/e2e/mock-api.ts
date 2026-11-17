@@ -26,7 +26,7 @@ const dailyWindows = (days = 31): Array<{ start: string; end: string }> => {
 
 const spaces = [
   {
-    id: 'space-futbol-1',
+    slug: 'cancha-central',
     name: 'Cancha Central',
     type: 'CANCHA_FUTBOL',
     capacity: 22,
@@ -35,7 +35,7 @@ const spaces = [
     availabilityWindows: dailyWindows(),
   },
   {
-    id: 'space-basquet-1',
+    slug: 'losa-municipal',
     name: 'Losa Municipal',
     type: 'LOSA_BASQUET',
     capacity: 10,
@@ -44,7 +44,7 @@ const spaces = [
     availabilityWindows: dailyWindows(),
   },
   {
-    id: 'space-tenis-1',
+    slug: 'pista-los-alamos',
     name: 'Pista Los Álamos',
     type: 'PISTA_TENIS',
     capacity: 4,
@@ -87,7 +87,7 @@ export const installApiMock = async (page: Page): Promise<ApiMock> => {
     }
     posts += 1;
     const body = route.request().postDataJSON() as {
-      userId: string;
+      dni: string;
       role: 'NEIGHBOR' | 'YOUTH' | 'SENIOR' | 'PRIVATE_CLUB';
       timeSlot: { start: string; end: string };
     };
@@ -99,8 +99,7 @@ export const installApiMock = async (page: Page): Promise<ApiMock> => {
       route,
       {
         id: 'reservation-e2e-1',
-        spaceId: 'space-futbol-1',
-        userId: body.userId,
+        spaceSlug: 'cancha-central',
         role: body.role,
         timeSlot: body.timeSlot,
         cost: { amount, currency: 'PEN' },
@@ -114,8 +113,7 @@ export const installApiMock = async (page: Page): Promise<ApiMock> => {
   await page.route(/\/api\/reservations\/[^/?]+$/, (route) =>
     json(route, {
       id: 'reservation-e2e-1',
-      spaceId: 'space-futbol-1',
-      userId: 'user-vecino-4589',
+      spaceSlug: 'cancha-central',
       role: 'SENIOR',
       timeSlot: {
         start: `${limaDateKey(new Date())}T10:00:00${LIMA_OFFSET}`,
@@ -128,8 +126,8 @@ export const installApiMock = async (page: Page): Promise<ApiMock> => {
   );
 
   await page.route(/\/api\/spaces\/(?!availability)[^/?]+$/, (route) => {
-    const id = new URL(route.request().url()).pathname.split('/').pop();
-    const space = spaces.find((candidate) => candidate.id === id);
+    const slug = new URL(route.request().url()).pathname.split('/').pop();
+    const space = spaces.find((candidate) => candidate.slug === slug);
     return space === undefined
       ? json(
           route,

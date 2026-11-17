@@ -23,7 +23,7 @@ describe('MyReservationsPage (S5)', () => {
   it('pide el identificador antes de buscar', () => {
     renderPage();
     expect(
-      screen.getByText('Ingresa tu identificador'),
+      screen.getByText('Ingresa tu DNI'),
     ).toBeInTheDocument();
   });
 
@@ -33,13 +33,13 @@ describe('MyReservationsPage (S5)', () => {
       screen.getByRole('button', { name: /Buscar reservas/ }),
     );
     expect(
-      await screen.findByText('Ingresa tu identificador para buscar tus reservas.'),
+      await screen.findByText('Ingresa tu DNI para buscar tus reservas.'),
     ).toBeInTheDocument();
   });
 
   it('lista las reservas del identificador y permite filtrarlas', async () => {
     server.use(
-      http.get('*/api/users/:userId/reservations', () =>
+      http.get('*/api/users/:dni/reservations', () =>
         HttpResponse.json([
           makeReservation({ id: 'reservation-active' }),
           makeReservation({ id: 'reservation-old', isActive: false }),
@@ -49,8 +49,8 @@ describe('MyReservationsPage (S5)', () => {
 
     renderPage();
     await userEvent.type(
-      screen.getByLabelText(/ID de usuario o DNI/),
-      'user-vecino-4589',
+      screen.getByLabelText(/^DNI/),
+      '12345678',
     );
     await userEvent.click(
       screen.getByRole('button', { name: /Buscar reservas/ }),
@@ -58,7 +58,7 @@ describe('MyReservationsPage (S5)', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Reservas de user-vecino-4589',
+        name: 'Reservas de 12345678',
       }),
     ).toBeInTheDocument();
     expect(await screen.findByText('2 reservas registradas')).toBeInTheDocument();
@@ -75,15 +75,15 @@ describe('MyReservationsPage (S5)', () => {
   it('muestra el estado vacío cuando no hay reservas', async () => {
     renderPage();
     await userEvent.type(
-      screen.getByLabelText(/ID de usuario o DNI/),
-      'user-sin-reservas',
+      screen.getByLabelText(/^DNI/),
+      '99999999',
     );
     await userEvent.click(
       screen.getByRole('button', { name: /Buscar reservas/ }),
     );
 
     expect(
-      await screen.findByText('Aún no tienes reservas con este identificador'),
+      await screen.findByText('Aún no tienes reservas con este DNI'),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Explorar espacios' }),
@@ -93,14 +93,14 @@ describe('MyReservationsPage (S5)', () => {
   it('no tiene violaciones de accesibilidad detectables por axe', async () => {
     renderPage();
     await userEvent.type(
-      screen.getByLabelText(/ID de usuario o DNI/),
-      'user-vecino-4589',
+      screen.getByLabelText(/^DNI/),
+      '12345678',
     );
     await userEvent.click(
       screen.getByRole('button', { name: /Buscar reservas/ }),
     );
     await screen.findByRole('heading', {
-      name: 'Reservas de user-vecino-4589',
+      name: 'Reservas de 12345678',
     });
 
     const results = await runAxe();

@@ -32,7 +32,7 @@ export const timeSlotSchema = z.object({
 });
 
 export const spaceSchema = z.object({
-  id: z.string(),
+  slug: z.string(),
   name: z.string(),
   type: spaceTypeSchema,
   capacity: z.number(),
@@ -43,8 +43,7 @@ export const spaceSchema = z.object({
 
 export const reservationSchema = z.object({
   id: z.string(),
-  spaceId: z.string(),
-  userId: z.string(),
+  spaceSlug: z.string(),
   role: userRoleSchema,
   timeSlot: timeSlotSchema,
   cost: costSchema,
@@ -54,8 +53,7 @@ export const reservationSchema = z.object({
 
 export const incidentSchema = z.object({
   id: z.string(),
-  spaceId: z.string(),
-  reporterId: z.string(),
+  spaceSlug: z.string(),
   description: z.string(),
   state: incidentStateSchema,
   createdAt: z.string(),

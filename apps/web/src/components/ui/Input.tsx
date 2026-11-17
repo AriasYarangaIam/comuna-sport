@@ -164,11 +164,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {...props}
         />
         {showCount && maxLength !== undefined ? (
-          <p
-            className="mt-1.5 text-right text-caption text-ink-soft"
-            aria-live="polite"
-            data-reading-hide
-          >
+          <p className="mt-1.5 text-right text-caption text-ink-soft" aria-live="polite">
             {count ?? 0} / {maxLength} caracteres
           </p>
         ) : null}
