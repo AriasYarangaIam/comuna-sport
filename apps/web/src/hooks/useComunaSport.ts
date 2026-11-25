@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type {
+  AssignableIncidentState,
   IncidentBody,
   IncidentDto,
   ReservationBody,
@@ -96,6 +97,39 @@ export const useCreateReservation = () => {
       // the request that was just accepted.
       void queryClient.invalidateQueries({
         queryKey: queryKeys.userReservations(variables.body.dni),
+      });
+    },
+  });
+};
+
+export const useCancelReservation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<ReservationDto, unknown, { reservationId: string; dni: string }>({
+    mutationFn: ({ reservationId }) => api.cancelReservation(reservationId),
+    onSuccess: (_cancelled, variables) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.userReservations(variables.dni),
+      });
+      // The freed band must disappear from the availability results.
+      void queryClient.invalidateQueries({ queryKey: ['spaces', 'availability'] });
+    },
+  });
+};
+
+export interface ChangeIncidentStateVariables {
+  incidentId: string;
+  state: AssignableIncidentState;
+  token: string;
+}
+
+export const useChangeIncidentState = () => {
+  const queryClient = useQueryClient();
+  return useMutation<IncidentDto, unknown, ChangeIncidentStateVariables>({
+    mutationFn: ({ incidentId, state, token }) =>
+      api.changeIncidentState(incidentId, state, token),
+    onSuccess: (incident) => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.incidents(incident.spaceSlug),
       });
     },
   });

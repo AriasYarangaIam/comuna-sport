@@ -32,6 +32,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/gestion" className="hover:text-ink hover:underline">
+                Gestión municipal
+              </Link>
+            </li>
+            <li>
               <Link to="/ayuda#transparencia" className="hover:text-ink hover:underline">
                 Portal de transparencia
               </Link>

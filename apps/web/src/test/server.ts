@@ -12,11 +12,15 @@ export interface CapturedReservationRequest {
 export const captured = {
   reservationRequests: [] as CapturedReservationRequest[],
   incidentRequests: [] as unknown[],
+  incidentPatches: [] as { incidentId: string; state: string; authorization: string | null }[],
+  cancelledReservations: [] as string[],
 };
 
 export const resetCaptured = (): void => {
   captured.reservationRequests = [];
   captured.incidentRequests = [];
+  captured.incidentPatches = [];
+  captured.cancelledReservations = [];
 };
 
 const jsonError = (
@@ -80,6 +84,13 @@ export const handlers = [
     HttpResponse.json(makeReservation({ id: String(params.reservationId) })),
   ),
 
+  http.delete('*/api/reservations/:reservationId', ({ params }) => {
+    captured.cancelledReservations.push(String(params.reservationId));
+    return HttpResponse.json(
+      makeReservation({ id: String(params.reservationId), isActive: false }),
+    );
+  }),
+
   http.get('*/api/users/:dni/reservations', () => HttpResponse.json([])),
 
   http.get('*/api/spaces/:spaceSlug/incidents', () =>
@@ -106,6 +117,23 @@ export const handlers = [
   http.get('*/api/incidents/:incidentId', ({ params }) =>
     HttpResponse.json(makeIncident({ id: String(params.incidentId) })),
   ),
+
+  // S1 (odd/tasks/demo-completion.md): the municipal lifecycle action.
+  http.patch('*/api/incidents/:incidentId', async ({ params, request }) => {
+    const body = (await request.json()) as { state: 'APPROVED' | 'REJECTED' | 'RESOLVED' };
+    captured.incidentPatches.push({
+      incidentId: String(params.incidentId),
+      state: body.state,
+      authorization: request.headers.get('Authorization'),
+    });
+    return HttpResponse.json(
+      makeIncident({
+        id: String(params.incidentId),
+        state: body.state,
+        resolvedAt: body.state === 'RESOLVED' ? new Date().toISOString() : null,
+      }),
+    );
+  }),
 ];
 
 export const server = setupServer(...handlers);
