@@ -4,6 +4,8 @@ import type { Request, RequestHandler, Response } from "express";
 
 import { EntityNotFoundException } from "../../../domain/exceptions/entity-not-found.exception";
 import type { IdempotencyStore } from "../../../application/ports/idempotency-store.interface";
+import type { CatalogMaintenance } from "../../../application/ports/catalog-maintenance.interface";
+import { matchesToken, presentedBearer, readSecret } from "../middleware/bearer-token";
 
 // S3 (odd/tasks/deploy-hardening.md): the scheduled sweep. Vercel invokes a cron
 // as `GET` on the configured path and, when `CRON_SECRET` is set on the project,
@@ -15,39 +17,35 @@ const UNAUTHORIZED_BODY = {
     error: { code: 'UNAUTHORIZED', message: 'The sweep endpoint requires the configured bearer token.' },
 };
 
-const readSecret = (): string | undefined => {
-    const raw: string | undefined = process.env[SWEEP_SECRET_VARIABLE];
-    return raw === undefined || raw.trim() === '' ? undefined : raw;
+// S3 (odd/tasks/demo-completion.md): the catalog horizon is materialised, so the
+// same scheduler keeps it rolling instead of letting availability expire.
+const CATALOG_UNAUTHORIZED_BODY = {
+    error: { code: 'UNAUTHORIZED', message: 'The catalog refresh endpoint requires the configured bearer token.' },
 };
 
-// Constant-time comparison over equal-length buffers. Length is checked first
-// because `timingSafeEqual` throws on a length mismatch, which would leak the
-// expected length through a 500.
-const matches = (presented: string, expected: string): boolean => {
-    const a: Buffer = Buffer.from(presented, 'utf8');
-    const b: Buffer = Buffer.from(expected, 'utf8');
-    if (a.length !== b.length) {
-        return false;
+const requireSecret = (req: Request, res: Response, unauthorizedBody: unknown): string | null => {
+    const secret: string | undefined = readSecret(SWEEP_SECRET_VARIABLE);
+
+    // Unconfigured deployment: the path does not exist at all, so nothing is
+    // exposed and a misconfigured scheduler fails loudly instead of running.
+    if (secret === undefined) {
+        throw new EntityNotFoundException('Route not found.', 'SWEEP_DISABLED');
     }
-    return timingSafeEqual(a, b);
+
+    const presented: string | null = presentedBearer(req.headers.authorization);
+    if (presented === null || !matchesToken(presented, secret)) {
+        res.status(401).json(unauthorizedBody);
+        return null;
+    }
+
+    return secret;
 };
 
-export const createInternalRoutes = (store: IdempotencyStore): Router => {
+export const createInternalRoutes = (store: IdempotencyStore, catalog: CatalogMaintenance): Router => {
     const router: Router = Router();
 
     const sweep: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-        const secret: string | undefined = readSecret();
-
-        // Unconfigured deployment: the path does not exist at all, so nothing is
-        // exposed and a misconfigured scheduler fails loudly instead of sweeping.
-        if (secret === undefined) {
-            throw new EntityNotFoundException('Route not found.', 'SWEEP_DISABLED');
-        }
-
-        const header: string | undefined = req.headers.authorization;
-        const prefix: string = 'Bearer ';
-        if (header === undefined || !header.startsWith(prefix) || !matches(header.slice(prefix.length), secret)) {
-            res.status(401).json(UNAUTHORIZED_BODY);
+        if (requireSecret(req, res, UNAUTHORIZED_BODY) === null) {
             return;
         }
 
@@ -55,6 +53,19 @@ export const createInternalRoutes = (store: IdempotencyStore): Router => {
         res.status(200).json({ swept: swept });
     };
 
+    const refreshCatalog: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+        if (requireSecret(req, res, CATALOG_UNAUTHORIZED_BODY) === null) {
+            return;
+        }
+
+        const extended: number = await catalog.refreshHorizon();
+        res.status(200).json({ extended: extended });
+    };
+
     router.get('/internal/idempotency/sweep', sweep);
+    router.get('/internal/catalog/refresh', refreshCatalog);
     return router;
 };
+
+// Re-exported for the guard tests that assert constant-time comparison semantics.
+export const __testing = { timingSafeEqual };

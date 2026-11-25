@@ -1,6 +1,8 @@
 import type { Router } from "express";
 import type { Pool } from "pg";
 
+import { CancelReservationHandler } from "../../application/handlers/cancel-reservation.handler";
+import { ChangeIncidentStateHandler } from "../../application/handlers/change-incident-state.handler";
 import { CreateIncidentHandler } from "../../application/handlers/create-incident.handler";
 import { CreateReservationHandler } from "../../application/handlers/create-reservation.handler";
 import { FindAvailableSpacesHandler } from "../../application/handlers/find-available-spaces.handler";
@@ -12,6 +14,7 @@ import { ListSpacesHandler } from "../../application/handlers/list-spaces.handle
 import { ListUserReservationsHandler } from "../../application/handlers/list-user-reservations.handler";
 import type { CommandBus } from "../../application/ports/command-bus.interface";
 import type { IdempotencyStore } from "../../application/ports/idempotency-store.interface";
+import type { CatalogMaintenance } from "../../application/ports/catalog-maintenance.interface";
 import type { QueryBus } from "../../application/ports/query-bus.interface";
 import { CommandBusService } from "../../application/services/command-bus.service";
 import { QueryBusService } from "../../application/services/query-bus.service";
@@ -26,6 +29,7 @@ import { SeniorDiscountStrategy } from "../../domain/services/cost-calculation/s
 import { IncidentController } from "../http/controllers/incident.controller";
 import { ReservationController } from "../http/controllers/reservation.controller";
 import { SpaceController } from "../http/controllers/space.controller";
+import { createAdminGuard } from "../http/middleware/admin-guard.middleware";
 import { createIdempotencyGuard } from "../http/middleware/idempotency.middleware";
 import { createIncidentRoutes } from "../http/routes/incident.routes";
 import { createInternalRoutes } from "../http/routes/internal.routes";
@@ -33,10 +37,12 @@ import { createReservationRoutes } from "../http/routes/reservation.routes";
 import { createSpaceRoutes } from "../http/routes/space.routes";
 import { NotificationListener } from "../event-bus/listeners/notification.listener";
 import { LocalEventBus } from "../event-bus/local-event-bus.service";
+import { InMemoryCatalogMaintenance } from "../persistence/in-memory/catalog.in-memory.maintenance";
 import { inMemoryIdempotencyStore } from "../persistence/in-memory/idempotency.in-memory.store";
 import { InMemoryIncidentRepository } from "../persistence/in-memory/incident.in-memory.repository";
 import { InMemoryReservationRepository } from "../persistence/in-memory/reservation.in-memory.repository";
 import { InMemorySpaceRepository } from "../persistence/in-memory/space.in-memory.repository";
+import { PostgresCatalogMaintenance } from "../persistence/postgres/catalog.postgres.maintenance";
 import { PostgresIdempotencyStore } from "../persistence/postgres/idempotency.postgres.store";
 import { PostgresIncidentRepository } from "../persistence/postgres/incident.postgres.repository";
 import { closePool, createPool } from "../persistence/postgres/pool";
@@ -125,11 +131,14 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
             new PostgresIncidentRepository(container.resolve<Pool>('pool')));
         container.register<IdempotencyStore>('idempotencyStore', (): IdempotencyStore =>
             new PostgresIdempotencyStore(container.resolve<Pool>('pool')));
+        container.register<CatalogMaintenance>('catalogMaintenance', (): CatalogMaintenance =>
+            new PostgresCatalogMaintenance(container.resolve<Pool>('pool')));
     } else {
         container.register('spaceRepository', (): InMemorySpaceRepository => new InMemorySpaceRepository());
         container.register('reservationRepository', (): InMemoryReservationRepository => new InMemoryReservationRepository());
         container.register('incidentRepository', (): InMemoryIncidentRepository => new InMemoryIncidentRepository());
         container.register<IdempotencyStore>('idempotencyStore', (): IdempotencyStore => inMemoryIdempotencyStore);
+        container.register<CatalogMaintenance>('catalogMaintenance', (): CatalogMaintenance => new InMemoryCatalogMaintenance());
     }
 
     container.register('eventBus', (): LocalEventBus => new LocalEventBus());
@@ -161,11 +170,27 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
             container.resolve<IncidentWriter>('incidentRepository')
         ));
 
+    container.register('cancelReservationHandler', (): CancelReservationHandler =>
+        new CancelReservationHandler(
+            container.resolve<ReservationReader>('reservationRepository'),
+            container.resolve<ReservationWriter>('reservationRepository'),
+            container.resolve<SpaceReader>('spaceRepository')
+        ));
+
+    container.register('changeIncidentStateHandler', (): ChangeIncidentStateHandler =>
+        new ChangeIncidentStateHandler(
+            container.resolve<IncidentReader>('incidentRepository'),
+            container.resolve<IncidentWriter>('incidentRepository'),
+            container.resolve<SpaceReader>('spaceRepository')
+        ));
+
     // §11 step 7: command bus with registered handlers.
     container.register('commandBus', (): CommandBusService => {
         const bus: CommandBusService = new CommandBusService();
         bus.register(container.resolve<CreateReservationHandler>('createReservationHandler'));
         bus.register(container.resolve<CreateIncidentHandler>('createIncidentHandler'));
+        bus.register(container.resolve<CancelReservationHandler>('cancelReservationHandler'));
+        bus.register(container.resolve<ChangeIncidentStateHandler>('changeIncidentStateHandler'));
         return bus;
     });
 
@@ -228,7 +253,10 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
         ));
 
     container.register('incidentRoutes', (): Router =>
-        createIncidentRoutes(container.resolve<IncidentController>('incidentController')));
+        createIncidentRoutes(
+            container.resolve<IncidentController>('incidentController'),
+            createAdminGuard()
+        ));
 
     container.register('spaceRoutes', (): Router =>
         createSpaceRoutes(container.resolve<SpaceController>('spaceController')));
@@ -237,7 +265,10 @@ export const buildContainer = (options: { readonly databaseUrl?: string } = {}):
     // request guard, so the in-memory and PostgreSQL adapters stay the only
     // place the TTL predicate is implemented.
     container.register('internalRoutes', (): Router =>
-        createInternalRoutes(container.resolve<IdempotencyStore>('idempotencyStore')));
+        createInternalRoutes(
+            container.resolve<IdempotencyStore>('idempotencyStore'),
+            container.resolve<CatalogMaintenance>('catalogMaintenance')
+        ));
 
     // §11 step 4: subscribe the notification listener to the event bus — the
     // listener is typed against the concrete event, so the literal below is

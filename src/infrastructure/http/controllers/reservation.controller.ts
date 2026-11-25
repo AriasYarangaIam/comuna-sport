@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import type { CreateReservationCommand } from "../../../application/commands/create-reservation.command";
+import type { CancelReservationCommand } from "../../../application/commands/cancel-reservation.command";
 import type { ReservationResponseDto } from "../../../application/dtos/reservation-response.dto";
 import type { CommandBus } from "../../../application/ports/command-bus.interface";
 import type { QueryBus } from "../../../application/ports/query-bus.interface";
@@ -67,6 +68,22 @@ export class ReservationController {
             res.status(201).json(dto);
         } catch (error: unknown) {
             next(error); // Error mapping is the errorHandler's job — exceptions propagate.
+        }
+    };
+
+    // S4 (odd/tasks/demo-completion.md): the reservation UUID is the citizen's
+    // credential, so DELETE needs no idempotency key. A second cancel is a 409.
+    public cancel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const params: ReservationIdParam = reservationIdParamSchema.parse(req.params);
+            const command: CancelReservationCommand = {
+                type: 'CANCEL_RESERVATION',
+                reservationId: params.id,
+            };
+            const dto: ReservationResponseDto = await this.commandBus.execute<ReservationResponseDto>(command);
+            res.status(200).json(dto);
+        } catch (error: unknown) {
+            next(error);
         }
     };
 
