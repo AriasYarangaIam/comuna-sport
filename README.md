@@ -82,9 +82,12 @@ set; every other suite runs offline.
 | `POST /spaces/:slug/reservations` | Create a reservation — requires `Idempotency-Key` and `dni` (`^\d{8}$`) |
 | `GET /reservations/:id` | Reservation detail |
 | `GET /users/:dni/reservations` | Reservations of a citizen (8-digit DNI, validated) |
+| `DELETE /reservations/:id` | Cancel a reservation — frees the band (UUID is the credential) |
 | `POST /incidents` | Report damage |
 | `GET /incidents/:id` · `GET /spaces/:slug/incidents` | Incident detail / list |
+| `PATCH /incidents/:id` | Municipal lifecycle action `{ state }` — requires `ADMIN_TOKEN` (404 when unset) |
 | `GET /internal/idempotency/sweep` | Cron-only sweep (404 unless `CRON_SECRET` is set) |
+| `GET /internal/catalog/refresh` | Cron-only rolling-horizon refresh (404 unless `CRON_SECRET` is set) |
 
 Spaces are addressed by their public `slug` (never by UUID), and the DNI is accepted as input only — no response ever echoes it. Errors always use the `{ "error": { "code", "message" } }` shape. Reservation
 creation honours the `Idempotency-Key` contract: `400` missing key, `409`

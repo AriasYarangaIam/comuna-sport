@@ -18,6 +18,7 @@ Both Vercel projects live in the team `fabricio-arias-projects-74046134` and are
 | `DATABASE_URL` | API project (Production + Preview) | yes | PostgreSQL connection string. The API uses the **pooled** Neon host (`…-pooler…`) because serverless instances each hold a pool. `sslmode=require` is kept. |
 | `PORT` | API process | no | Listening port. Defaults to `3000`; platforms inject their own. An unusable value fails the boot with `PORT must be an integer between 1 and 65535`. |
 | `VITE_API_BASE_URL` | Web project (Production) | yes | Absolute API origin, inlined at build time. Changing it requires a redeploy. |
+| `ADMIN_TOKEN` | API project (Production) | no | Code that authorises the municipal management surface (`PATCH /incidents/:id` and the `/gestion` screen). Sent as `Authorization: Bearer <value>`. Unset means the route answers 404, so an unconfigured deployment exposes no lifecycle action. |
 
 TLS for the database comes from the connection string, not from code: `sslmode=require` is treated
 by `pg-connection-string` as `verify-full`.
@@ -123,6 +124,12 @@ one. `pnpm preview` (local static build) is the only place a `localhost` base UR
 - **Availability is informative.** `GET /spaces/availability` answers which spaces have the slot
   inside their availability window; overlap is validated when the reservation is created, so a slot
   can be listed and still answer `409 RESERVATION_CONFLICT`, and the SPA offers alternatives.
+- **The catalog horizon rolls daily.** Availability windows are rows for today + 29 days, so they
+  expire unless something extends them. `GET /internal/catalog/refresh` extends the horizon for every
+  active space and is idempotent (`{"extended": <n>}`, `0` on an immediate re-run); `vercel.json`
+  schedules it at 03:15 UTC, after the idempotency sweep. Same auth contract as the sweep:
+  `Authorization: Bearer $CRON_SECRET`, `404` when the secret is unset, `401` on a wrong token.
+
 - **Idempotency is durable** in PostgreSQL with a 24 h TTL. `pnpm db:sweep` clears expired rows by
   hand and `GET /internal/idempotency/sweep` does the same over HTTP, so a scheduler can drive it:
 
