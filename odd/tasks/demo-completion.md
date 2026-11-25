@@ -67,6 +67,26 @@ DELETE /reservations/:id
 | T7 | S1–S4 | Documentación (`DESIGN.md`, `DEPLOYMENT.md`, `.env.example`, `README.md`) | inline | — |
 | T8 | S1–S4 | Work-unit commits en la rama feature | inline | — |
 
+### Delivery strategy — slice boundary
+
+Rama `feat/demo-completion` desde `main` (cd06b21). Tres slices con superficies disjuntas:
+
+| Slice | Commit | Size | Contents |
+| --- | --- | --- | --- |
+| API + DB + cron | `aaa956e` | 17 files | `src/**`, `tests/e2e/demo-completion.test.ts`, `vercel.json` |
+| SPA | `85c544f` | 12 files | `apps/web/src/**` (`/gestion`, cancelación, hooks, MSW) |
+| Docs | `e8d834b` | 5 files | `.env.example`, `DEPLOYMENT.md`, `DESIGN.md`, `README.md`, este documento |
+
+Las dos unidades de código superan la guía de ~400 líneas porque cada una cierra un contrato
+completo (ruta + handler + puerto + adaptador + tests, o pantalla + hook + MSW + tests): partir
+más fino dejaría commits intermedios que no compilan. Registrado aquí como límite de entrega.
+
+Evidence (observed, 2026-11-25):
+- root `pnpm typecheck` exit 0 · `pnpm build` exit 0 · `pnpm test` 223 passed / 0 failed / 20 skipped
+- `apps/web` `pnpm typecheck` exit 0 · `pnpm test:run` 56/56 · `pnpm e2e` 10/10
+- `tests/e2e/demo-completion.test.ts` 12/12 (S1: 200/400/401/404/422 + terminal REJECTED; S3: refresh idempotente y protegido; S4: 200/409/404 y la franja liberada)
+- Nota: el reloj del entorno avanzó al 2026-11-25 durante la sesión; la suite S4 deriva la franja de las ventanas reales en lugar de una fecha fija.
+
 ## Log
 
 L1 (user, verbatim): "Si, procede con ello"
