@@ -9,6 +9,7 @@ import {
   spaceSchema,
 } from './schemas';
 import type {
+  AssignableIncidentState,
   IncidentBody,
   IncidentDto,
   ReservationBody,
@@ -156,6 +157,15 @@ export const api = {
       { signal },
     ),
 
+  // S4 (odd/tasks/demo-completion.md): the reservation UUID is the credential,
+  // so no idempotency key is needed.
+  cancelReservation: (reservationId: string): Promise<ReservationDto> =>
+    request(
+      `/reservations/${encodeURIComponent(reservationId)}`,
+      reservationSchema,
+      { method: 'DELETE' },
+    ),
+
   getUserReservations: (
     dni: string,
     signal?: AbortSignal,
@@ -170,6 +180,19 @@ export const api = {
     request('/incidents', incidentSchema, {
       method: 'POST',
       body: JSON.stringify(body),
+    }),
+
+  // S1: the municipal action that moves the lifecycle. The token travels in the
+  // Authorization header and never becomes part of the URL or the payload.
+  changeIncidentState: (
+    incidentId: string,
+    state: AssignableIncidentState,
+    token: string,
+  ): Promise<IncidentDto> =>
+    request(`/incidents/${encodeURIComponent(incidentId)}`, incidentSchema, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ state: state }),
     }),
 
   getIncident: (incidentId: string, signal?: AbortSignal): Promise<IncidentDto> =>

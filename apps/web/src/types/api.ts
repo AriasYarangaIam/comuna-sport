@@ -29,6 +29,10 @@ export interface ReservationBody {
   };
 }
 
+// S1 (odd/tasks/demo-completion.md): the municipal operator may move an incident
+// to one of these three states; UNDER_REVIEW is only the initial one.
+export type AssignableIncidentState = 'APPROVED' | 'REJECTED' | 'RESOLVED';
+
 export interface IncidentBody {
   spaceSlug: string;
   dni: string;

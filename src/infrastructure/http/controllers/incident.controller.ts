@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { CreateIncidentCommand } from "../../../application/commands/create-incident.command";
+import type { ChangeIncidentStateCommand } from "../../../application/commands/change-incident-state.command";
 import type { IncidentResponseDto } from "../../../application/dtos/incident-response.dto";
 import type { CommandBus } from "../../../application/ports/command-bus.interface";
 import type { QueryBus } from "../../../application/ports/query-bus.interface";
@@ -25,11 +26,18 @@ const incidentIdParamSchema = z.object({
     id: z.string().min(1),
 });
 
+// S1 (odd/tasks/demo-completion.md): only the three operator-target states are
+// accepted — UNDER_REVIEW is the initial state and is never assigned by hand.
+const incidentStateBodySchema = z.object({
+    state: z.enum(['APPROVED', 'REJECTED', 'RESOLVED']),
+});
+
 const spaceSlugParamSchema = z.object({
     slug: z.string().min(1),
 });
 
 type IncidentBody = z.infer<typeof incidentBodySchema>;
+type IncidentStateBody = z.infer<typeof incidentStateBodySchema>;
 type IncidentIdParam = z.infer<typeof incidentIdParamSchema>;
 type SpaceSlugParam = z.infer<typeof spaceSlugParamSchema>;
 
@@ -55,6 +63,22 @@ export class IncidentController {
             res.status(201).json(dto);
         } catch (error: unknown) {
             next(error); // Error mapping is the errorHandler's job — exceptions propagate.
+        }
+    };
+
+    public changeState = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const params: IncidentIdParam = incidentIdParamSchema.parse(req.params);
+            const body: IncidentStateBody = incidentStateBodySchema.parse(req.body);
+            const command: ChangeIncidentStateCommand = {
+                type: 'CHANGE_INCIDENT_STATE',
+                incidentId: params.id,
+                state: body.state,
+            };
+            const dto: IncidentResponseDto = await this.commandBus.execute<IncidentResponseDto>(command);
+            res.status(200).json(dto);
+        } catch (error: unknown) {
+            next(error); // InvalidStateTransitionException → 422 in the error handler.
         }
     };
 

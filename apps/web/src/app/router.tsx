@@ -37,6 +37,11 @@ const HelpPage = lazy(() =>
     default: module.HelpPage,
   })),
 );
+const GestionPage = lazy(() =>
+  import('../features/management/GestionPage').then((module) => ({
+    default: module.GestionPage,
+  })),
+);
 const NotFoundPage = lazy(() =>
   import('../features/not-found/NotFoundPage').then((module) => ({
     default: module.NotFoundPage,
@@ -55,6 +60,7 @@ const router = createBrowserRouter([
       { path: 'mis-reservas', element: <MyReservationsPage /> },
       { path: 'incidentes', element: <IncidentsPage /> },
       { path: 'ayuda', element: <HelpPage /> },
+      { path: 'gestion', element: <GestionPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

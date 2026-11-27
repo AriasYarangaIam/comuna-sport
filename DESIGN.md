@@ -18,7 +18,7 @@ cuatro puntos que, tal como estaban, producían pantallas no implementables:
 | :-- | :--- | :--- | :--- |
 | V1 | Paleta fría/oscura (`#0F766E` verde petróleo + ámbar `#F59E0B` sobre fondo humo) | Identidad "municipal gris"; ámbar sobre fondo claro no alcanza contraste AA como texto | Paleta **celeste clara** completa con contrastes medidos (§3.1) |
 | V2 | Nombres, precios y horarios de espacios inventados ("Cancha Municipal Norte", 08:00–22:00 para todos) | La UI mentiría sobre el catálogo real y bloquearía horarios válidos | Todo se lee de la API; horarios derivados de `availabilityWindows` por espacio (§6.1) |
-| V3 | Botones "Aprobar / Rechazar / Resolver" y "Cancelar reserva" | **No existe endpoint** que los respalde (solo `POST /incidents` y lecturas) | El ciclo de vida se visualiza en solo lectura; se documenta la brecha (§6.3) |
+| V3 | Botones "Aprobar / Rechazar / Resolver" y "Cancelar reserva" | **No existía endpoint** que los respaldara (solo `POST /incidents` y lecturas) | Superado el 2026-11-25: ciclo de vida en `/gestion` con `ADMIN_TOKEN` y cancelación en S5 (§6.3) |
 | V4 | Wireframes estáticos, sin estados de carga/vacío/error ni reglas de motion | UI percibida como maqueta, no como producto "dinámico" | Estados por componente, motion tokens y criterios de aceptación por pantalla (§4, §5, §8) |
 
 Detalle completo con evidencia `archivo:línea` en el **Anexo A**.
@@ -442,11 +442,12 @@ nuevamente" + rotación silenciosa de la llave.
 │ │ 24 oct 2026 · 10:00–12:00 · S/ 50.00 PEN                                 │ │
 │ │ Código 7f3c2b1a…4b77                            [Ver detalle]            │ │
 │ └──────────────────────────────────────────────────────────────────────────┘ │
-│ ⓘ Esta versión no permite cancelar reservas desde la web.                    │
+│ ⓘ Puedes cancelar una reserva activa: el bloque vuelve a quedar libre.       │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- No hay endpoint de cancelación: **no** se muestra acción "Cancelar" (§6.3).
+- La cancelación es explícita: botón "Cancelar reserva" + diálogo de confirmación; al confirmar, el
+  bloque vuelve a la disponibilidad pública (S4, `odd/tasks/demo-completion.md`).
 - Orden por `createdAt` descendente, calculado en cliente.
 - Estado vacío: "Aún no tienes reservas con este DNI" + CTA "Explorar espacios".
 
@@ -512,6 +513,8 @@ pantalla. No forma parte de los prompts de Stitch (no aporta al diseño visual e
 | `GET /reservations/:id` | `ReservationResponseDto` | Detalle de S5 |
 | `GET /users/:dni/reservations` | `ReservationResponseDto[]` | S5 |
 | `POST /incidents` | `201 IncidentResponseDto` | S6 (reporte) |
+| `PATCH /incidents/:id` + `Authorization: Bearer $ADMIN_TOKEN` | `200 IncidentResponseDto` | Gestión municipal (`/gestion`) |
+| `DELETE /reservations/:id` | `200 ReservationResponseDto` (`isActive:false`) | S5 (cancelar) |
 | `GET /incidents/:id` | `IncidentResponseDto` | Detalle de S6 |
 | `GET /spaces/:slug/incidents` | `IncidentResponseDto[]` | Listado de S6 |
 
@@ -544,8 +547,8 @@ Contrato del servidor que la UI debe reflejar sin reinterpretarlo (`idempotency.
 
 | Función imaginada en el borrador | Estado real | Decisión de UI |
 | :--- | :--- | :--- |
-| Aprobar / Rechazar / Resolver incidente | El agregado lo permite (`incident.entity.ts:74-84`), **sin ruta HTTP** | Riel de estados en solo lectura + nota "La gestión la realiza el municipio" |
-| Cancelar reserva | No existe `DELETE`/`PATCH` en `reservation.routes.ts` | Sin botón "Cancelar"; se informa en S5 |
+| Aprobar / Rechazar / Resolver incidente | **CERRADA 2026-11-25** — `PATCH /incidents/:id` protegido con `ADMIN_TOKEN` (`odd/tasks/demo-completion.md` S1) | Riel de estados en solo lectura para el ciudadano + pantalla `/gestion` para el municipio (S2) |
+| Cancelar reserva | **CERRADA 2026-11-25** — `DELETE /reservations/:id` (S4) | Botón "Cancelar reserva" en S5 con confirmación explícita |
 | Aforo disponible por franja | Solo se detecta solapamiento de franjas, no ocupación | Se muestra `capacity` como dato del espacio, nunca como "lugares libres" |
 | Paginación / búsqueda de espacios | `GET /spaces` devuelve todo | Filtro y orden en cliente; sin paginador |
 | Notificaciones configurables | Evento del lado servidor (`NotificationListener`) | Aviso informativo, sin interruptores |

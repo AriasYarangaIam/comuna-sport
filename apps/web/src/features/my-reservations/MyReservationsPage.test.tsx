@@ -1,11 +1,11 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { makeReservation } from '../../test/fixtures';
 import { renderWithProviders } from '../../test/render';
-import { server } from '../../test/server';
+import { captured, server } from '../../test/server';
 import { MyReservationsPage } from './MyReservationsPage';
 
 const renderPage = () => renderWithProviders(<MyReservationsPage />);
@@ -88,6 +88,27 @@ describe('MyReservationsPage (S5)', () => {
     expect(
       screen.getByRole('link', { name: 'Explorar espacios' }),
     ).toHaveAttribute('href', '/');
+  });
+
+  it('cancela una reserva activa y avisa que el bloque queda libre', async () => {
+    server.use(
+      http.get('*/api/users/:dni/reservations', () =>
+        HttpResponse.json([makeReservation({ id: 'reservation-cancelable' })]),
+      ),
+    );
+    renderPage();
+    await userEvent.type(screen.getByLabelText(/^DNI/), '12345678');
+    await userEvent.click(screen.getByRole('button', { name: /Buscar reservas/ }));
+
+    const cancelButton = await screen.findByRole('button', { name: /Cancelar reserva/ });
+    await userEvent.click(cancelButton);
+
+    // La confirmación es explícita: nada se cancela con un solo toque.
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /Sí, cancelar/ }));
+
+    await waitFor(() => expect(captured.cancelledReservations).toEqual(['reservation-cancelable']));
+    expect(await screen.findByText(/El horario vuelve a estar disponible/)).toBeInTheDocument();
   });
 
   it('no tiene violaciones de accesibilidad detectables por axe', async () => {

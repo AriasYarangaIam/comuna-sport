@@ -7,9 +7,11 @@ import {
   Search,
   SearchX,
   Wrench,
+  XCircle,
 } from 'lucide-react';
 import type { ReservationDto } from '../../types/api';
 import {
+  useCancelReservation,
   useSpaces,
   useUserReservations,
 } from '../../hooks/useComunaSport';
@@ -29,6 +31,7 @@ import { InlineAlert } from '../../components/ui/InlineAlert';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ListSkeleton } from '../../components/ui/Skeleton';
 import { TextInput } from '../../components/ui/Input';
+import { Dialog } from '../../components/ui/Dialog';
 import { ReservationStatusBadge } from '../../components/domain/StatusBadge';
 
 type Filter = 'all' | 'active' | 'inactive';
@@ -85,6 +88,34 @@ export function MyReservationsPage() {
   });
 
   const copy = isError ? toUserFacingError(error, 'reservations') : null;
+
+  // S4 (odd/tasks/demo-completion.md): cancelling frees the band for everybody.
+  const [pendingCancel, setPendingCancel] = useState<ReservationDto | null>(null);
+  const [cancelFeedback, setCancelFeedback] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const cancelMutation = useCancelReservation();
+
+  const confirmCancel = (): void => {
+    if (pendingCancel === null) {
+      return;
+    }
+    const target: ReservationDto = pendingCancel;
+    setCancelError(null);
+    cancelMutation.mutate(
+      { reservationId: target.id, dni: activeDni },
+      {
+        onSuccess: () => {
+          setPendingCancel(null);
+          setCancelFeedback(
+            'Reserva cancelada. El horario vuelve a estar disponible para la comunidad.',
+          );
+        },
+        onError: () => {
+          setCancelError('No pudimos cancelar la reserva. Inténtalo de nuevo en un momento.');
+        },
+      },
+    );
+  };
 
   const handleSearch = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -247,6 +278,11 @@ export function MyReservationsPage() {
                   <ReservationRow
                     key={reservation.id}
                     reservation={reservation}
+                    onRequestCancel={(target: ReservationDto) => {
+                      setCancelFeedback(null);
+                      setCancelError(null);
+                      setPendingCancel(target);
+                    }}
                     spaceName={
                       spaceNames.get(reservation.spaceSlug)?.name ??
                       'Espacio deportivo municipal'
@@ -259,13 +295,52 @@ export function MyReservationsPage() {
               </ul>
             ) : null}
 
+            {cancelFeedback !== null ? (
+              <div className="mt-5" role="status" aria-live="polite">
+                <InlineAlert tone="success" title="Reserva cancelada">
+                  {cancelFeedback}
+                </InlineAlert>
+              </div>
+            ) : null}
+
             <p className="mt-5 text-small text-ink-soft">
-              Esta versión no permite cancelar reservas desde la web. Si
-              necesitas anular una, contacta a la mesa de partes del municipio.
+              Puedes cancelar una reserva activa: el bloque vuelve a quedar
+              disponible para el resto de la comunidad.
             </p>
           </div>
         </section>
       )}
+
+      <Dialog
+        open={pendingCancel !== null}
+        onClose={() => setPendingCancel(null)}
+        title="Cancelar reserva"
+        description="El bloque volverá a estar disponible para otras personas. Esta acción no se puede deshacer."
+        footer={
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button variant="ghost" onClick={() => setPendingCancel(null)}>
+              Conservar reserva
+            </Button>
+            <Button loading={cancelMutation.isPending} onClick={confirmCancel}>
+              <XCircle className="h-4 w-4" aria-hidden="true" />
+              Sí, cancelar
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-small text-ink-soft">
+          {pendingCancel === null
+            ? ''
+            : `${spaceNames.get(pendingCancel.spaceSlug)?.name ?? 'El espacio'} · ${formatDateLong(pendingCancel.timeSlot.start)} · ${formatTimeRange(pendingCancel.timeSlot.start, pendingCancel.timeSlot.end)}`}
+        </p>
+        {cancelError !== null ? (
+          <div className="mt-3">
+            <InlineAlert tone="danger" title="No se pudo cancelar">
+              {cancelError}
+            </InlineAlert>
+          </div>
+        ) : null}
+      </Dialog>
     </div>
   );
 }
@@ -274,10 +349,12 @@ function ReservationRow({
   reservation,
   spaceName,
   spaceType,
+  onRequestCancel,
 }: {
   reservation: ReservationDto;
   spaceName: string;
   spaceType: keyof typeof SPACE_TYPE_META | null;
+  onRequestCancel: (reservation: ReservationDto) => void;
 }) {
   const TypeIcon =
     spaceType === null ? CalendarDays : SPACE_TYPE_META[spaceType].icon;
@@ -333,6 +410,16 @@ function ReservationRow({
             <Wrench className="h-4 w-4" aria-hidden="true" />
             Reportar un daño
           </Link>
+          {reservation.isActive ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRequestCancel(reservation)}
+            >
+              <XCircle className="h-4 w-4" aria-hidden="true" />
+              Cancelar reserva
+            </Button>
+          ) : null}
         </div>
       </div>
     </li>
